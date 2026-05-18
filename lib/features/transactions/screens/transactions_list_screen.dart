@@ -7,12 +7,16 @@ import '../../../core/models/models.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../core/widgets/animated_widgets.dart';
 import '../providers/transactions_provider.dart';
 import '../../categories/providers/categories_provider.dart';
 import '../../accounts/providers/accounts_provider.dart';
 import '../../home/screens/dashboard_screen.dart';
 
-/// Transactions List Screen (Tab in Main Screen)
+/// Tab filter state provider
+final transactionTabProvider = StateProvider<int>((ref) => 0);
+
+/// Transactions List Screen - Redesigned with animations
 class TransactionsListScreen extends ConsumerWidget {
   const TransactionsListScreen({super.key});
 
@@ -20,59 +24,214 @@ class TransactionsListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedMonth = ref.watch(selectedMonthProvider);
     final filter = ref.watch(transactionFilterProvider);
+    final currentTab = ref.watch(transactionTabProvider);
     final groupedTransactions =
         ref.watch(filteredDailyGroupedTransactionsProvider(selectedMonth));
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Sort dates in descending order
     final sortedDates = groupedTransactions.keys.toList()
       ..sort((a, b) => b.compareTo(a));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Transactions'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search_rounded),
-            onPressed: () => context.push(AppRoutes.search),
-          ),
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.filter_list_rounded),
-                onPressed: () => _showFilterSheet(context, ref),
-              ),
-              if (filter.hasFilters)
-                Positioned(
-                  right: 8,
-                  top: 8,
-                  child: Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: context.colorScheme.primary,
-                      shape: BoxShape.circle,
-                    ),
+      body: CustomScrollView(
+        slivers: [
+          // App Bar with title and synced profile
+          SliverAppBar(
+            floating: true,
+            pinned: true,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            title: Row(
+              children: [
+                const ProfileAvatar(radius: 16),
+                const SizedBox(width: 12),
+                Text(
+                  'Spendora',
+                  style: context.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF0D4A3E),
                   ),
                 ),
+              ],
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.notifications_outlined),
+                onPressed: () {},
+              ),
             ],
           ),
+
+          // Search Bar with animation
+          SliverToBoxAdapter(
+            child: AnimatedFadeSlide(
+              delay: const Duration(milliseconds: 100),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => context.push(AppRoutes.search),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 14),
+                          decoration: BoxDecoration(
+                            color:
+                                isDark ? const Color(0xFF252538) : Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: context.colorScheme.onSurface
+                                  .withValues(alpha: 0.1),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.search_rounded,
+                                color: context.colorScheme.onSurface
+                                    .withValues(alpha: 0.4),
+                                size: 22,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  'Search transactions...',
+                                  style: context.textTheme.bodyMedium?.copyWith(
+                                    color: context.colorScheme.onSurface
+                                        .withValues(alpha: 0.4),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Filter Button
+                    GestureDetector(
+                      onTap: () => _showFilterSheet(context, ref),
+                      child: Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: filter.hasFilters
+                              ? context.colorScheme.primary
+                              : (isDark ? const Color(0xFF252538) : Colors.white),
+                          borderRadius: BorderRadius.circular(12),
+                          border: filter.hasFilters
+                              ? null
+                              : Border.all(
+                                  color: context.colorScheme.onSurface
+                                      .withValues(alpha: 0.1),
+                                ),
+                        ),
+                        child: Icon(
+                          Icons.tune_rounded,
+                          color: filter.hasFilters
+                              ? Colors.white
+                              : context.colorScheme.primary,
+                          size: 22,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Filter Tabs
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _FilterTab(
+                      label: 'All',
+                      isSelected: currentTab == 0,
+                      onTap: () {
+                        ref.read(transactionTabProvider.notifier).state = 0;
+                        ref.read(transactionFilterProvider.notifier).state =
+                            const TransactionFilter();
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _FilterTab(
+                      label: 'Transactions',
+                      isSelected: currentTab == 1,
+                      onTap: () {
+                        ref.read(transactionTabProvider.notifier).state = 1;
+                        ref.read(transactionFilterProvider.notifier).state =
+                            const TransactionFilter();
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _FilterTab(
+                      label: 'Income',
+                      isSelected: currentTab == 2,
+                      onTap: () {
+                        ref.read(transactionTabProvider.notifier).state = 2;
+                        ref.read(transactionFilterProvider.notifier).state =
+                            const TransactionFilter(
+                                type: TransactionType.income);
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    _FilterTab(
+                      label: 'Expenses',
+                      isSelected: currentTab == 3,
+                      onTap: () {
+                        ref.read(transactionTabProvider.notifier).state = 3;
+                        ref.read(transactionFilterProvider.notifier).state =
+                            const TransactionFilter(
+                                type: TransactionType.expense);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          const SliverToBoxAdapter(child: SizedBox(height: 16)),
+
+          // Transaction List
+          if (sortedDates.isEmpty)
+            SliverFillRemaining(
+              child: _buildEmptyState(context, filter.hasFilters),
+            )
+          else
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  final date = sortedDates[index];
+                  final transactions = groupedTransactions[date]!;
+                  return _DaySection(
+                    date: date,
+                    transactions: transactions,
+                  );
+                },
+                childCount: sortedDates.length,
+              ),
+            ),
+
+          // Bottom spacing for FAB
+          const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
-      body: sortedDates.isEmpty
-          ? _buildEmptyState(context, filter.hasFilters)
-          : ListView.builder(
-              padding: const EdgeInsets.only(bottom: 100),
-              itemCount: sortedDates.length,
-              itemBuilder: (context, index) {
-                final date = sortedDates[index];
-                final transactions = groupedTransactions[date]!;
+    );
+  }
 
-                return _DaySection(
-                  date: date,
-                  transactions: transactions,
-                );
-              },
-            ),
+  void _showFilterSheet(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _FilterSheet(),
     );
   }
 
@@ -120,13 +279,49 @@ class TransactionsListScreen extends ConsumerWidget {
       ),
     );
   }
+}
 
-  void _showFilterSheet(BuildContext context, WidgetRef ref) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _FilterSheet(),
+/// Filter Tab Widget
+class _FilterTab extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _FilterTab({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (isDark ? const Color(0xFF7C4DFF) : const Color(0xFF0D4A3E))
+              : (isDark ? const Color(0xFF252538) : Colors.white),
+          borderRadius: BorderRadius.circular(20),
+          border: isSelected
+              ? null
+              : Border.all(
+                  color: context.colorScheme.onSurface.withValues(alpha: 0.1),
+                ),
+        ),
+        child: Text(
+          label,
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: isSelected
+                ? Colors.white
+                : context.colorScheme.onSurface.withValues(alpha: 0.7),
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -143,217 +338,153 @@ class _DaySection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Calculate day totals
-    double income = 0;
-    double expense = 0;
-
-    for (final t in transactions) {
-      if (t.type == TransactionType.income) {
-        income += t.amount;
-      } else if (t.type == TransactionType.expense) {
-        expense += t.amount;
-      }
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Date Header
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Text(
-                AppFormatters.formatRelativeDate(date),
-                style: context.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: context.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                AppFormatters.formatDate(date),
-                style: context.textTheme.bodySmall?.copyWith(
-                  color: context.colorScheme.onSurface.withValues(alpha: 0.5),
-                ),
-              ),
-              const Spacer(),
-              if (income > 0)
-                Text(
-                  '+${AppFormatters.formatCurrency(income)}',
-                  style: context.textTheme.bodySmall?.copyWith(
-                    color: AppTheme.income,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              if (income > 0 && expense > 0)
-                Text(
-                  '  ',
-                  style: context.textTheme.bodySmall,
-                ),
-              if (expense > 0)
-                Text(
-                  '-${AppFormatters.formatCurrency(expense)}',
-                  style: context.textTheme.bodySmall?.copyWith(
-                    color: AppTheme.expense,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-            ],
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Text(
+            AppFormatters.formatRelativeDate(date).toUpperCase(),
+            style: context.textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: context.colorScheme.onSurface.withValues(alpha: 0.5),
+              letterSpacing: 1.2,
+            ),
           ),
         ),
 
-        // Transactions
+        // Transaction Cards
         ...transactions.map(
-          (transaction) => _TransactionItem(transaction: transaction),
+          (transaction) => _TransactionCard(transaction: transaction),
         ),
-
-        const SizedBox(height: 8),
       ],
     );
   }
 }
 
-/// Individual Transaction Item with swipe actions
-class _TransactionItem extends ConsumerWidget {
+/// Individual Transaction Card - Redesigned to match Figma
+class _TransactionCard extends ConsumerWidget {
   final TransactionModel transaction;
 
-  const _TransactionItem({required this.transaction});
+  const _TransactionCard({required this.transaction});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final category = ref.watch(categoryByIdProvider(transaction.categoryId));
-    final account = ref.watch(accountByIdProvider(transaction.accountId));
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final isExpense = transaction.type == TransactionType.expense;
-    final color = isExpense ? AppTheme.expense : AppTheme.income;
+    final amountColor = isExpense ? AppTheme.expense : AppTheme.income;
     final sign = isExpense ? '-' : '+';
 
-    return Slidable(
-      endActionPane: ActionPane(
-        motion: const DrawerMotion(),
-        children: [
-          SlidableAction(
-            onPressed: (context) => _editTransaction(context),
-            backgroundColor: AppTheme.info,
-            foregroundColor: Colors.white,
-            icon: Icons.edit_rounded,
-            label: 'Edit',
-          ),
-          SlidableAction(
-            onPressed: (context) => _deleteTransaction(context, ref),
-            backgroundColor: AppTheme.error,
-            foregroundColor: Colors.white,
-            icon: Icons.delete_rounded,
-            label: 'Delete',
-          ),
-        ],
-      ),
-      child: InkWell(
-        onTap: () => context.push('/transaction/${transaction.id}'),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              // Category Icon
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: category != null
-                      ? Color(category.colorValue).withValues(alpha: 0.15)
-                      : Colors.grey.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(
-                  category != null
-                      ? IconData(category.iconCodePoint,
-                          fontFamily: 'MaterialIcons')
-                      : Icons.category,
-                  color: category != null
-                      ? Color(category.colorValue)
-                      : Colors.grey,
-                  size: 24,
-                ),
-              ),
-              const SizedBox(width: 14),
+    // Get category color or default
+    final iconColor = category != null
+        ? Color(category.colorValue)
+        : (isExpense ? AppTheme.expense : AppTheme.income);
 
-              // Details
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      category?.name ?? 'Unknown',
-                      style: context.textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Slidable(
+        endActionPane: ActionPane(
+          motion: const DrawerMotion(),
+          children: [
+            SlidableAction(
+              onPressed: (context) => _editTransaction(context),
+              backgroundColor: AppTheme.info,
+              foregroundColor: Colors.white,
+              icon: Icons.edit_rounded,
+              label: 'Edit',
+              borderRadius: BorderRadius.circular(12),
+            ),
+            SlidableAction(
+              onPressed: (context) => _deleteTransaction(context, ref),
+              backgroundColor: AppTheme.error,
+              foregroundColor: Colors.white,
+              icon: Icons.delete_rounded,
+              label: 'Delete',
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ],
+        ),
+        child: GestureDetector(
+          onTap: () => context.push('/transaction/${transaction.id}'),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF252538) : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: context.colorScheme.onSurface.withValues(alpha: 0.05),
+              ),
+              boxShadow: isDark
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.03),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        Icon(
-                          IconData(account?.iconCodePoint ?? 0xe850,
-                              fontFamily: 'MaterialIcons'),
-                          size: 12,
+                    ],
+            ),
+            child: Row(
+              children: [
+                // Category Icon
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: iconColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    category != null
+                        ? IconData(category.iconCodePoint,
+                            fontFamily: 'MaterialIcons')
+                        : (isExpense ? Icons.shopping_bag : Icons.attach_money),
+                    color: iconColor,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: 14),
+
+                // Details
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        transaction.notes?.isNotEmpty == true
+                            ? transaction.notes!
+                            : (category?.name ?? 'Transaction'),
+                        style: context.textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${category?.name ?? 'Unknown'} • ${AppFormatters.formatTime(transaction.dateTime)}',
+                        style: context.textTheme.bodySmall?.copyWith(
                           color: context.colorScheme.onSurface
                               .withValues(alpha: 0.5),
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          account?.name ?? '',
-                          style: context.textTheme.bodySmall?.copyWith(
-                            color: context.colorScheme.onSurface
-                                .withValues(alpha: 0.6),
-                          ),
-                        ),
-                        if (transaction.notes != null &&
-                            transaction.notes!.isNotEmpty) ...[
-                          Text(
-                            ' • ',
-                            style: context.textTheme.bodySmall?.copyWith(
-                              color: context.colorScheme.onSurface
-                                  .withValues(alpha: 0.4),
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              transaction.notes!,
-                              style: context.textTheme.bodySmall?.copyWith(
-                                color: context.colorScheme.onSurface
-                                    .withValues(alpha: 0.5),
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
 
-              // Amount
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    '$sign${AppFormatters.formatCurrency(transaction.amount)}',
-                    style: context.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                    ),
+                // Amount
+                Text(
+                  '$sign${AppFormatters.formatCurrency(transaction.amount)}',
+                  style: context.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: amountColor,
                   ),
-                  Text(
-                    AppFormatters.formatTime(transaction.dateTime),
-                    style: context.textTheme.labelSmall?.copyWith(
-                      color:
-                          context.colorScheme.onSurface.withValues(alpha: 0.5),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -364,7 +495,7 @@ class _TransactionItem extends ConsumerWidget {
     context.push('/edit-transaction/${transaction.id}');
   }
 
-  Future<void> _deleteTransaction(BuildContext context, WidgetRef ref) async {
+  void _deleteTransaction(BuildContext context, WidgetRef ref) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -376,9 +507,9 @@ class _TransactionItem extends ConsumerWidget {
             onPressed: () => Navigator.pop(context, false),
             child: const Text('Cancel'),
           ),
-          ElevatedButton(
+          TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.error),
+            style: TextButton.styleFrom(foregroundColor: AppTheme.error),
             child: const Text('Delete'),
           ),
         ],
@@ -386,24 +517,15 @@ class _TransactionItem extends ConsumerWidget {
     );
 
     if (confirm == true) {
-      await ref
-          .read(transactionsProvider.notifier)
-          .deleteTransaction(transaction.id);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Transaction deleted'),
-          action: SnackBarAction(
-            label: 'Undo',
-            onPressed: () {
-              // Re-add the transaction
-              ref
-                  .read(transactionsProvider.notifier)
-                  .addTransaction(transaction);
-            },
+      ref.read(transactionsProvider.notifier).deleteTransaction(transaction.id);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Transaction deleted'),
+            backgroundColor: AppTheme.success,
           ),
-        ),
-      );
+        );
+      }
     }
   }
 }

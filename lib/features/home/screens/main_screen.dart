@@ -34,7 +34,7 @@ class MainScreen extends ConsumerWidget {
       ),
       bottomNavigationBar: _buildBottomNav(context, ref, currentIndex),
       floatingActionButton: _buildFAB(context),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
@@ -42,58 +42,68 @@ class MainScreen extends ConsumerWidget {
       BuildContext context, WidgetRef ref, int currentIndex) {
     return Container(
       decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
         ],
       ),
-      child: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavItem(
-              context,
-              ref,
-              index: 0,
-              icon: Icons.home_outlined,
-              activeIcon: Icons.home_rounded,
-              label: 'Home',
-              currentIndex: currentIndex,
-            ),
-            _buildNavItem(
-              context,
-              ref,
-              index: 1,
-              icon: Icons.receipt_long_outlined,
-              activeIcon: Icons.receipt_long_rounded,
-              label: 'History',
-              currentIndex: currentIndex,
-            ),
-            const SizedBox(width: 48), // Space for FAB
-            _buildNavItem(
-              context,
-              ref,
-              index: 3,
-              icon: Icons.pie_chart_outline,
-              activeIcon: Icons.pie_chart_rounded,
-              label: 'Budgets',
-              currentIndex: currentIndex,
-            ),
-            _buildNavItem(
-              context,
-              ref,
-              index: 4,
-              icon: Icons.more_horiz_outlined,
-              activeIcon: Icons.more_horiz_rounded,
-              label: 'More',
-              currentIndex: currentIndex,
-            ),
-          ],
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(
+                context,
+                ref,
+                index: 0,
+                icon: Icons.home_outlined,
+                activeIcon: Icons.home_rounded,
+                label: 'Home',
+                currentIndex: currentIndex,
+              ),
+              _buildNavItem(
+                context,
+                ref,
+                index: 1,
+                icon: Icons.receipt_long_outlined,
+                activeIcon: Icons.receipt_long_rounded,
+                label: 'Transactions',
+                currentIndex: currentIndex,
+              ),
+              _buildNavItem(
+                context,
+                ref,
+                index: 2,
+                icon: Icons.bar_chart_outlined,
+                activeIcon: Icons.bar_chart_rounded,
+                label: 'Reports',
+                currentIndex: currentIndex,
+              ),
+              _buildNavItem(
+                context,
+                ref,
+                index: 3,
+                icon: Icons.account_balance_wallet_outlined,
+                activeIcon: Icons.account_balance_wallet_rounded,
+                label: 'Budgets',
+                currentIndex: currentIndex,
+              ),
+              _buildNavItem(
+                context,
+                ref,
+                index: 4,
+                icon: Icons.more_horiz_outlined,
+                activeIcon: Icons.more_horiz_rounded,
+                label: 'More',
+                currentIndex: currentIndex,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -145,17 +155,25 @@ class MainScreen extends ConsumerWidget {
   }
 
   Widget _buildFAB(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: const LinearGradient(
-          colors: [Color(0xFF6C63FF), Color(0xFF8B83FF)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: isDark
+            ? const LinearGradient(
+                colors: [Color(0xFF7C4DFF), Color(0xFFA78BFA)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : const LinearGradient(
+                colors: [Color(0xFF0D4A3E), Color(0xFF166555)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6C63FF).withValues(alpha: 0.4),
+            color: (isDark ? const Color(0xFF7C4DFF) : const Color(0xFF0D4A3E))
+                .withValues(alpha: 0.4),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),

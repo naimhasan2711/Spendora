@@ -5,9 +5,9 @@ import 'package:go_router/go_router.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../core/widgets/animated_widgets.dart';
 import '../../transactions/providers/transactions_provider.dart';
 import '../../accounts/providers/accounts_provider.dart';
-import '../widgets/summary_card.dart';
 import '../widgets/recent_transactions_card.dart';
 import '../widgets/spending_chart_card.dart';
 import '../widgets/category_breakdown_card.dart';
@@ -16,7 +16,7 @@ import '../widgets/budget_overview_card.dart';
 /// Selected month provider for dashboard
 final selectedMonthProvider = StateProvider<DateTime>((ref) => DateTime.now());
 
-/// Dashboard Screen
+/// Dashboard Screen - Redesigned with animations
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
@@ -25,301 +25,99 @@ class DashboardScreen extends ConsumerWidget {
     final selectedMonth = ref.watch(selectedMonthProvider);
     final summary = ref.watch(monthlySummaryProvider(selectedMonth));
     final totalBalance = ref.watch(totalBalanceProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // App Bar with Total Balance
+          // Custom App Bar with Profile and Settings
           SliverAppBar(
-            expandedHeight: 160,
+            expandedHeight: 60,
             floating: false,
             pinned: true,
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      context.colorScheme.primary.withValues(alpha: 0.1),
-                      Theme.of(context).scaffoldBackgroundColor,
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
+            title: Row(
+              children: [
+                // Profile Avatar - synced from settings
+                const ProfileAvatar(radius: 18),
+                const SizedBox(width: 12),
+                Text(
+                  'Spendora',
+                  style: context.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : const Color(0xFF0D4A3E),
                   ),
                 ),
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 50, 20, 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              'Hello! 👋',
-                              style: context.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const Spacer(),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: (totalBalance >= 0
-                                        ? AppTheme.income
-                                        : AppTheme.expense)
-                                    .withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    totalBalance >= 0
-                                        ? Icons.trending_up_rounded
-                                        : Icons.trending_down_rounded,
-                                    size: 16,
-                                    color: totalBalance >= 0
-                                        ? AppTheme.income
-                                        : AppTheme.expense,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    totalBalance >= 0 ? 'Healthy' : 'Low',
-                                    style:
-                                        context.textTheme.labelSmall?.copyWith(
-                                      color: totalBalance >= 0
-                                          ? AppTheme.income
-                                          : AppTheme.expense,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Total Balance',
-                          style: context.textTheme.bodySmall?.copyWith(
-                            color: context.colorScheme.onSurface
-                                .withValues(alpha: 0.6),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          AppFormatters.formatCurrency(totalBalance),
-                          style: context.textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: totalBalance >= 0
-                                ? AppTheme.income
-                                : AppTheme.expense,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              ],
             ),
             actions: [
               IconButton(
-                icon: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: context.colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    Icons.search_rounded,
-                    color: context.colorScheme.primary,
-                    size: 20,
-                  ),
+                icon: Icon(
+                  Icons.settings_outlined,
+                  color: context.colorScheme.onSurface,
                 ),
-                onPressed: () => context.push(AppRoutes.search),
-              ),
-              IconButton(
-                icon: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: context.colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    Icons.notifications_outlined,
-                    color: context.colorScheme.primary,
-                    size: 20,
-                  ),
-                ),
-                onPressed: () {
-                  // TODO: Show notifications
-                },
+                onPressed: () => context.push(AppRoutes.settings),
               ),
               const SizedBox(width: 8),
             ],
           ),
 
-          // Month Selector
+          // Total Balance Card with animation
           SliverToBoxAdapter(
-            child: _MonthSelector(
-              selectedMonth: selectedMonth,
-              onPreviousMonth: () {
-                ref.read(selectedMonthProvider.notifier).state =
-                    DateHelpers.previousMonth(selectedMonth);
-              },
-              onNextMonth: () {
-                final nextMonth = DateHelpers.nextMonth(selectedMonth);
-                if (nextMonth
-                    .isBefore(DateTime.now().add(const Duration(days: 32)))) {
-                  ref.read(selectedMonthProvider.notifier).state = nextMonth;
-                }
-              },
-            ),
-          ),
-
-          // Summary Cards
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: SummaryCard(
-                      title: 'Income',
-                      amount: summary.income,
-                      icon: Icons.arrow_downward_rounded,
-                      color: AppTheme.income,
-                      trend: '+12%', // TODO: Calculate actual trend
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: SummaryCard(
-                      title: 'Expense',
-                      amount: summary.expense,
-                      icon: Icons.arrow_upward_rounded,
-                      color: AppTheme.expense,
-                      trend: '-5%',
-                    ),
-                  ),
-                ],
+            child: AnimatedFadeSlide(
+              delay: const Duration(milliseconds: 100),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: _buildBalanceCard(context, totalBalance, summary),
               ),
             ),
           ),
 
-          // Balance Card
+          // Weekly Trend Chart with animation
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: AppTheme.primaryGradient,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: context.colorScheme.primary.withValues(alpha: 0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Monthly Balance',
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: Colors.white.withValues(alpha: 0.8),
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          AppFormatters.formatCurrency(summary.balance),
-                          style: context.textTheme.headlineMedium?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            summary.savingsRate >= 0
-                                ? Icons.trending_up_rounded
-                                : Icons.trending_down_rounded,
-                            color: Colors.white,
-                            size: 16,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${summary.savingsRate.toStringAsFixed(0)}% saved',
-                            style: context.textTheme.bodySmall?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+            child: AnimatedFadeSlide(
+              delay: const Duration(milliseconds: 200),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SpendingChartCard(month: selectedMonth),
               ),
             ),
           ),
 
-          // Spending Chart
+          // Category Breakdown with animation
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: SpendingChartCard(month: selectedMonth),
+            child: AnimatedFadeSlide(
+              delay: const Duration(milliseconds: 300),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: CategoryBreakdownCard(month: selectedMonth),
+              ),
             ),
           ),
 
-          // Category Breakdown
+          // Monthly Budgets Section with animation
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: CategoryBreakdownCard(month: selectedMonth),
+            child: AnimatedFadeSlide(
+              delay: const Duration(milliseconds: 400),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: BudgetOverviewCard(month: selectedMonth),
+              ),
             ),
           ),
 
-          // Budget Overview
+          // Recent Transactions with animation
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: BudgetOverviewCard(month: selectedMonth),
+            child: AnimatedFadeSlide(
+              delay: const Duration(milliseconds: 500),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: RecentTransactionsCard(month: selectedMonth),
+              ),
             ),
           ),
 
-          // Recent Transactions
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: RecentTransactionsCard(month: selectedMonth),
-            ),
-          ),
-
-          // Bottom spacing
+          // Bottom spacing for FAB
           const SliverToBoxAdapter(
             child: SizedBox(height: 100),
           ),
@@ -327,66 +125,137 @@ class DashboardScreen extends ConsumerWidget {
       ),
     );
   }
-}
 
-/// Month Selector Widget
-class _MonthSelector extends StatelessWidget {
-  final DateTime selectedMonth;
-  final VoidCallback onPreviousMonth;
-  final VoidCallback onNextMonth;
-
-  const _MonthSelector({
-    required this.selectedMonth,
-    required this.onPreviousMonth,
-    required this.onNextMonth,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isCurrentMonth =
-        DateHelpers.isSameMonth(selectedMonth, DateTime.now());
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+  Widget _buildBalanceCard(
+      BuildContext context, double totalBalance, MonthlySummary summary) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF0D4A3E), Color(0xFF166555)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0D4A3E).withValues(alpha: 0.3),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconButton(
-            icon: const Icon(Icons.chevron_left_rounded),
-            onPressed: onPreviousMonth,
+          Text(
+            'TOTAL BALANCE',
+            style: context.textTheme.labelSmall?.copyWith(
+              color: Colors.white.withValues(alpha: 0.7),
+              letterSpacing: 1.2,
+              fontWeight: FontWeight.w500,
+            ),
           ),
-          GestureDetector(
-            onTap: () => _showMonthPicker(context),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: context.colorScheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                AppFormatters.formatMonthYear(selectedMonth),
-                style: context.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: context.colorScheme.primary,
+          const SizedBox(height: 8),
+          TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: totalBalance),
+            duration: const Duration(milliseconds: 800),
+            curve: Curves.easeOutCubic,
+            builder: (context, value, child) {
+              return Text(
+                AppFormatters.formatCurrency(value),
+                style: context.textTheme.headlineLarge?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 32,
                 ),
-              ),
-            ),
+              );
+            },
           ),
-          IconButton(
-            icon: Icon(
-              Icons.chevron_right_rounded,
-              color: isCurrentMonth
-                  ? context.colorScheme.onSurface.withValues(alpha: 0.3)
-                  : null,
-            ),
-            onPressed: isCurrentMonth ? null : onNextMonth,
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              _BalanceBadge(
+                icon: Icons.arrow_downward_rounded,
+                label: 'Income',
+                amount: summary.income,
+                backgroundColor: AppTheme.income.withValues(alpha: 0.2),
+                textColor: Colors.white,
+              ),
+              const SizedBox(width: 16),
+              _BalanceBadge(
+                icon: Icons.arrow_upward_rounded,
+                label: 'Expenses',
+                amount: summary.expense,
+                backgroundColor: AppTheme.expense.withValues(alpha: 0.2),
+                textColor: Colors.white,
+              ),
+            ],
           ),
         ],
       ),
     );
   }
+}
 
-  void _showMonthPicker(BuildContext context) {
-    // TODO: Implement month picker dialog
+/// Badge widget for income/expense in balance card
+class _BalanceBadge extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final double amount;
+  final Color backgroundColor;
+  final Color textColor;
+
+  const _BalanceBadge({
+    required this.icon,
+    required this.label,
+    required this.amount,
+    required this.backgroundColor,
+    required this.textColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Icon(icon, color: textColor, size: 14),
+          ),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: context.textTheme.labelSmall?.copyWith(
+                  color: textColor.withValues(alpha: 0.7),
+                  fontSize: 10,
+                ),
+              ),
+              Text(
+                AppFormatters.formatCurrency(amount),
+                style: context.textTheme.titleSmall?.copyWith(
+                  color: textColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }

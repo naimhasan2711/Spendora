@@ -102,6 +102,18 @@ class SettingsNotifier extends StateNotifier<SettingsModel> {
     await _saveSettings();
   }
 
+  /// Update user name
+  Future<void> setUserName(String name) async {
+    state = state.copyWith(userName: name);
+    await _saveSettings();
+  }
+
+  /// Update user profile image path
+  Future<void> setUserImagePath(String? imagePath) async {
+    state = state.copyWith(userImagePath: imagePath);
+    await _saveSettings();
+  }
+
   /// Verify PIN
   bool verifyPin(String pin) {
     return state.pinCode == pin;

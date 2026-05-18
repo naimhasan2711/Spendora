@@ -1,32 +1,33 @@
 import 'package:flutter/material.dart';
 
 /// App Theme Configuration with Material 3 Design
+/// Updated to match Figma design specifications
 class AppTheme {
   AppTheme._();
 
-  // Primary Colors
-  static const Color _primaryLight = Color(0xFF6C63FF);
-  static const Color _primaryDark = Color(0xFF8B83FF);
+  // Primary Colors - Dark Green (from design)
+  static const Color _primaryLight = Color(0xFF0D4A3E);
+  static const Color _primaryDark = Color(0xFF7C4DFF); // Purple for dark theme
 
   // Secondary Colors
-  static const Color _secondaryLight = Color(0xFF03DAC6);
-  static const Color _secondaryDark = Color(0xFF03DAC6);
+  static const Color _secondaryLight = Color(0xFF10B981);
+  static const Color _secondaryDark = Color(0xFFA78BFA);
 
   // Background Colors
-  static const Color _backgroundLight = Color(0xFFF8F9FE);
-  static const Color _backgroundDark = Color(0xFF121212);
+  static const Color _backgroundLight = Color(0xFFF5F5F5);
+  static const Color _backgroundDark = Color(0xFF0F0F1E);
 
   // Surface Colors
   static const Color _surfaceLight = Color(0xFFFFFFFF);
-  static const Color _surfaceDark = Color(0xFF1E1E1E);
+  static const Color _surfaceDark = Color(0xFF1A1A2E);
 
   // Card Colors
   static const Color _cardLight = Color(0xFFFFFFFF);
-  static const Color _cardDark = Color(0xFF2D2D2D);
+  static const Color _cardDark = Color(0xFF252538);
 
   // Text Colors
-  static const Color _textPrimaryLight = Color(0xFF1A1A2E);
-  static const Color _textPrimaryDark = Color(0xFFE1E1E1);
+  static const Color _textPrimaryLight = Color(0xFF1F2937);
+  static const Color _textPrimaryDark = Color(0xFFFFFFFF);
   static const Color _textSecondaryLight = Color(0xFF6B7280);
   static const Color _textSecondaryDark = Color(0xFF9CA3AF);
 
@@ -40,9 +41,16 @@ class AppTheme {
   static const Color income = Color(0xFF22C55E);
   static const Color expense = Color(0xFFEF4444);
 
-  // Gradient Colors
+  // Gradient Colors - Primary Green Gradient (for balance card)
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [Color(0xFF6C63FF), Color(0xFF8B83FF)],
+    colors: [Color(0xFF0D4A3E), Color(0xFF166555)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // Purple Gradient for dark theme FAB
+  static const LinearGradient purpleGradient = LinearGradient(
+    colors: [Color(0xFF7C4DFF), Color(0xFFA78BFA)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

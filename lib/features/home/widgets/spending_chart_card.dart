@@ -7,7 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';
 import '../../transactions/providers/transactions_provider.dart';
 
-/// Spending Chart Card - Line chart showing daily spending trend
+/// Spending Chart Card - Bar chart showing weekly spending trend
 class SpendingChartCard extends ConsumerWidget {
   final DateTime month;
 
@@ -16,38 +16,61 @@ class SpendingChartCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final transactions = ref.watch(monthlyTransactionsProvider(month));
-    final dailyData = _calculateDailySpending(transactions, month);
+    final weeklyData = _calculateWeeklySpending(transactions);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: isDark ? const Color(0xFF252538) : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Spending Trend',
-            style: context.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+          // Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Weekly Trend',
+                style: context.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: context.colorScheme.onSurface.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'Last 7 Days',
+                  style: context.textTheme.labelSmall?.copyWith(
+                    color: context.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
           SizedBox(
-            height: 180,
-            child: _hasNoSpending(dailyData)
+            height: 160,
+            child: _hasNoSpending(weeklyData)
                 ? _buildEmptyState(context)
-                : LineChart(
-                    _buildLineChartData(context, dailyData),
-                    duration: const Duration(milliseconds: 250),
+                : BarChart(
+                    _buildBarChartData(context, weeklyData),
+                    swapAnimationDuration: const Duration(milliseconds: 250),
                   ),
           ),
         ],
@@ -56,56 +79,69 @@ class SpendingChartCard extends ConsumerWidget {
   }
 
   /// Check if there's no spending data
-  bool _hasNoSpending(Map<int, double> dailyData) {
-    return dailyData.values.every((v) => v == 0);
+  bool _hasNoSpending(List<double> weeklyData) {
+    return weeklyData.every((v) => v == 0);
   }
 
-  Map<int, double> _calculateDailySpending(
-    List<TransactionModel> transactions,
-    DateTime month,
-  ) {
-    final dailySpending = <int, double>{};
-    final daysInMonth = DateHelpers.daysInMonth(month);
+  /// Calculate spending for the last 7 days (Mon-Sun)
+  List<double> _calculateWeeklySpending(List<TransactionModel> transactions) {
+    final now = DateTime.now();
+    final weekData = List<double>.filled(7, 0);
 
-    // Initialize all days to 0
-    for (int day = 1; day <= daysInMonth; day++) {
-      dailySpending[day] = 0;
-    }
+    // Calculate spending for each of the last 7 days
+    for (int i = 0; i < 7; i++) {
+      final date = now.subtract(Duration(days: 6 - i));
+      final dayStart = DateTime(date.year, date.month, date.day);
+      final dayEnd = dayStart.add(const Duration(days: 1));
 
-    // Sum expenses for each day
-    for (final transaction in transactions) {
-      if (transaction.type == TransactionType.expense) {
-        final day = transaction.dateTime.day;
-        dailySpending[day] = (dailySpending[day] ?? 0) + transaction.amount;
+      for (final transaction in transactions) {
+        if (transaction.type == TransactionType.expense &&
+            transaction.dateTime.isAfter(dayStart) &&
+            transaction.dateTime.isBefore(dayEnd)) {
+          weekData[i] += transaction.amount;
+        }
       }
     }
 
-    return dailySpending;
+    return weekData;
   }
 
-  LineChartData _buildLineChartData(
-    BuildContext context,
-    Map<int, double> dailyData,
-  ) {
-    final spots = dailyData.entries
-        .map((e) => FlSpot(e.key.toDouble(), e.value))
-        .toList();
-
-    final maxY = dailyData.values.isEmpty
+  BarChartData _buildBarChartData(
+      BuildContext context, List<double> weeklyData) {
+    final maxY = weeklyData.isEmpty
         ? 1000.0
-        : dailyData.values.reduce((a, b) => a > b ? a : b) * 1.2;
+        : weeklyData.reduce((a, b) => a > b ? a : b) * 1.2;
 
-    // Ensure interval is never 0
-    final interval = maxY > 0 ? maxY / 4 : 250.0;
+    // Day labels for last 7 days
+    final now = DateTime.now();
+    final dayLabels = <String>[];
+    for (int i = 0; i < 7; i++) {
+      final date = now.subtract(Duration(days: 6 - i));
+      dayLabels.add(_getDayLabel(date.weekday));
+    }
 
-    return LineChartData(
-      gridData: FlGridData(
-        show: true,
-        drawVerticalLine: false,
-        horizontalInterval: interval,
-        getDrawingHorizontalLine: (value) => FlLine(
-          color: context.colorScheme.outline.withValues(alpha: 0.1),
-          strokeWidth: 1,
+    // Bar color - salmon/peach like in the design
+    const barColor = Color(0xFFEBB89C);
+
+    return BarChartData(
+      alignment: BarChartAlignment.spaceAround,
+      maxY: maxY > 0 ? maxY : 1000,
+      barTouchData: BarTouchData(
+        enabled: true,
+        touchTooltipData: BarTouchTooltipData(
+          getTooltipColor: (group) => context.colorScheme.surface,
+          tooltipPadding:
+              const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          tooltipMargin: 8,
+          getTooltipItem: (group, groupIndex, rod, rodIndex) {
+            return BarTooltipItem(
+              '${dayLabels[group.x.toInt()]}\n${AppFormatters.formatCurrency(rod.toY)}',
+              context.textTheme.bodySmall!.copyWith(
+                color: context.colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
+            );
+          },
         ),
       ),
       titlesData: FlTitlesData(
@@ -113,32 +149,23 @@ class SpendingChartCard extends ConsumerWidget {
         rightTitles:
             const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        leftTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 50,
-            interval: interval,
-            getTitlesWidget: (value, meta) {
-              return Text(
-                AppFormatters.formatCompactCurrency(value),
-                style: context.textTheme.labelSmall?.copyWith(
-                  color: context.colorScheme.onSurface.withValues(alpha: 0.5),
-                ),
-              );
-            },
-          ),
-        ),
+        leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            reservedSize: 24,
-            interval: 7,
+            reservedSize: 28,
             getTitlesWidget: (value, meta) {
-              if (value % 7 == 1 || value == 1) {
-                return Text(
-                  value.toInt().toString(),
-                  style: context.textTheme.labelSmall?.copyWith(
-                    color: context.colorScheme.onSurface.withValues(alpha: 0.5),
+              final index = value.toInt();
+              if (index >= 0 && index < dayLabels.length) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    dayLabels[index],
+                    style: context.textTheme.labelSmall?.copyWith(
+                      color:
+                          context.colorScheme.onSurface.withValues(alpha: 0.5),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 );
               }
@@ -147,50 +174,52 @@ class SpendingChartCard extends ConsumerWidget {
           ),
         ),
       ),
+      gridData: const FlGridData(show: false),
       borderData: FlBorderData(show: false),
-      minX: 1,
-      maxX: dailyData.length.toDouble(),
-      minY: 0,
-      maxY: maxY,
-      lineBarsData: [
-        LineChartBarData(
-          spots: spots,
-          isCurved: true,
-          curveSmoothness: 0.3,
-          color: context.colorScheme.primary,
-          barWidth: 3,
-          isStrokeCapRound: true,
-          dotData: const FlDotData(show: false),
-          belowBarData: BarAreaData(
-            show: true,
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                context.colorScheme.primary.withValues(alpha: 0.3),
-                context.colorScheme.primary.withValues(alpha: 0.0),
-              ],
+      barGroups: weeklyData.asMap().entries.map((entry) {
+        final index = entry.key;
+        final value = entry.value;
+
+        return BarChartGroupData(
+          x: index,
+          barRods: [
+            BarChartRodData(
+              toY: value > 0 ? value : 0,
+              color: barColor,
+              width: 28,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(6)),
+              backDrawRodData: BackgroundBarChartRodData(
+                show: true,
+                toY: maxY > 0 ? maxY : 1000,
+                color: context.colorScheme.onSurface.withValues(alpha: 0.05),
+              ),
             ),
-          ),
-        ),
-      ],
-      lineTouchData: LineTouchData(
-        touchTooltipData: LineTouchTooltipData(
-          getTooltipColor: (spot) => context.colorScheme.surface,
-          getTooltipItems: (spots) {
-            return spots.map((spot) {
-              return LineTooltipItem(
-                'Day ${spot.x.toInt()}\n${AppFormatters.formatCurrency(spot.y)}',
-                context.textTheme.bodySmall!.copyWith(
-                  color: context.colorScheme.onSurface,
-                  fontWeight: FontWeight.w600,
-                ),
-              );
-            }).toList();
-          },
-        ),
-      ),
+          ],
+        );
+      }).toList(),
     );
+  }
+
+  String _getDayLabel(int weekday) {
+    switch (weekday) {
+      case 1:
+        return 'Mon';
+      case 2:
+        return 'Tue';
+      case 3:
+        return 'Wed';
+      case 4:
+        return 'Thu';
+      case 5:
+        return 'Fri';
+      case 6:
+        return 'Sat';
+      case 7:
+        return 'Sun';
+      default:
+        return '';
+    }
   }
 
   Widget _buildEmptyState(BuildContext context) {
@@ -199,13 +228,13 @@ class SpendingChartCard extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.show_chart_rounded,
+            Icons.bar_chart_rounded,
             size: 48,
             color: context.colorScheme.onSurface.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 8),
           Text(
-            'No spending data',
+            'No spending this week',
             style: context.textTheme.bodyMedium?.copyWith(
               color: context.colorScheme.onSurface.withValues(alpha: 0.5),
             ),

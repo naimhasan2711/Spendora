@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/router/app_router.dart';
+import '../../../core/services/export_service.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/animated_widgets.dart';
 
 /// More Screen - Additional features and settings
 class MoreScreen extends ConsumerWidget {
@@ -11,74 +13,91 @@ class MoreScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('More'),
+        title: Row(
+          children: [
+            const ProfileAvatar(radius: 16),
+            const SizedBox(width: 12),
+            Text(
+              'Spendora',
+              style: context.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : const Color(0xFF0D4A3E),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => context.push(AppRoutes.settings),
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Quick Actions Section
-          _buildSection(
-            context,
-            title: 'Quick Actions',
-            children: [
-              _buildMenuItem(
-                context,
-                icon: Icons.category_outlined,
-                title: 'Categories',
-                subtitle: 'Manage expense & income categories',
-                onTap: () => context.push(AppRoutes.categories),
-              ),
-              _buildMenuItem(
-                context,
-                icon: Icons.account_balance_wallet_outlined,
-                title: 'Accounts',
-                subtitle: 'Manage your accounts',
-                onTap: () => context.push(AppRoutes.accounts),
-              ),
-              _buildMenuItem(
-                context,
-                icon: Icons.calendar_today_outlined,
-                title: 'Calendar View',
-                subtitle: 'View expenses on calendar',
-                onTap: () => context.push(AppRoutes.calendar),
-              ),
-            ],
+          // Quick Actions Section with animation
+          AnimatedFadeSlide(
+            delay: const Duration(milliseconds: 100),
+            child: _buildSection(
+              context,
+              title: 'Quick Actions',
+              children: [
+                _buildMenuItem(
+                  context,
+                  icon: Icons.category_outlined,
+                  title: 'Categories',
+                  subtitle: 'Manage expense & income categories',
+                  onTap: () => context.push(AppRoutes.categories),
+                ),
+                _buildMenuItem(
+                  context,
+                  icon: Icons.account_balance_wallet_outlined,
+                  title: 'Accounts',
+                  subtitle: 'Manage your accounts',
+                  onTap: () => context.push(AppRoutes.accounts),
+                ),
+                _buildMenuItem(
+                  context,
+                  icon: Icons.calendar_today_outlined,
+                  title: 'Calendar View',
+                  subtitle: 'View expenses on calendar',
+                  onTap: () => context.push(AppRoutes.calendar),
+                ),
+              ],
+            ),
           ),
 
           const SizedBox(height: 24),
 
-          // Financial Tools Section
-          _buildSection(
-            context,
-            title: 'Financial Tools',
-            children: [
-              _buildMenuItem(
-                context,
-                icon: Icons.savings_outlined,
-                title: 'Savings Goals',
-                subtitle: 'Track your savings targets',
-                onTap: () => context.push(AppRoutes.goals),
-                badge: 'NEW',
-              ),
-              _buildMenuItem(
-                context,
-                icon: Icons.swap_horiz_rounded,
-                title: 'Debts & Loans',
-                subtitle: 'Track borrowed and lent money',
-                onTap: () => context.push(AppRoutes.debts),
-              ),
-              _buildMenuItem(
-                context,
-                icon: Icons.analytics_outlined,
-                title: 'Reports',
-                subtitle: 'Detailed financial analytics',
-                onTap: () {
-                  // Navigate to reports tab
-                },
-              ),
-            ],
+          // Financial Tools Section with animation
+          AnimatedFadeSlide(
+            delay: const Duration(milliseconds: 200),
+            child: _buildSection(
+              context,
+              title: 'Financial Tools',
+              children: [
+                _buildMenuItem(
+                  context,
+                  icon: Icons.savings_outlined,
+                  title: 'Savings Goals',
+                  subtitle: 'Track your savings targets',
+                  onTap: () => context.push(AppRoutes.goals),
+                  badge: 'NEW',
+                ),
+                _buildMenuItem(
+                  context,
+                  icon: Icons.swap_horiz_rounded,
+                  title: 'Debts & Loans',
+                  subtitle: 'Track borrowed and lent money',
+                  onTap: () => context.push(AppRoutes.debts),
+                ),
+              ],
+            ),
           ),
 
           const SizedBox(height: 24),
@@ -100,14 +119,14 @@ class MoreScreen extends ConsumerWidget {
                 icon: Icons.file_download_outlined,
                 title: 'Export to CSV',
                 subtitle: 'Export transactions as spreadsheet',
-                onTap: () => _exportToCSV(context, ref),
+                onTap: () => _exportToCSV(context),
               ),
               _buildMenuItem(
                 context,
                 icon: Icons.picture_as_pdf_outlined,
                 title: 'Generate PDF Report',
                 subtitle: 'Create printable report',
-                onTap: () => _generatePDF(context, ref),
+                onTap: () => _generatePDF(context),
               ),
             ],
           ),
@@ -147,30 +166,35 @@ class MoreScreen extends ConsumerWidget {
     required String title,
     required List<Widget> children,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
           child: Text(
-            title,
-            style: context.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: context.colorScheme.primary,
+            title.toUpperCase(),
+            style: context.textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: context.colorScheme.onSurface.withValues(alpha: 0.5),
+              letterSpacing: 1.2,
             ),
           ),
         ),
         Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
+            color: isDark ? const Color(0xFF252538) : Colors.white,
             borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            boxShadow: isDark
+                ? null
+                : [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
           ),
           child: Column(children: children),
         ),
@@ -263,30 +287,92 @@ class MoreScreen extends ConsumerWidget {
     );
   }
 
-  void _exportToCSV(BuildContext context, WidgetRef ref) {
-    // TODO: Implement CSV export
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('CSV export coming soon!')),
+  void _exportToCSV(BuildContext context) async {
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
+
+    try {
+      final success = await ExportService.instance.shareCSV();
+
+      if (context.mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              success
+                  ? 'CSV exported successfully!'
+                  : 'Failed to export CSV. Please try again.',
+            ),
+            backgroundColor: success ? AppTheme.success : AppTheme.error,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.error),
+        );
+      }
+    }
   }
 
-  void _generatePDF(BuildContext context, WidgetRef ref) {
-    // TODO: Implement PDF generation
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('PDF generation coming soon!')),
+  void _generatePDF(BuildContext context) async {
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
+
+    try {
+      final success = await ExportService.instance.sharePDFReport();
+
+      if (context.mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              success
+                  ? 'PDF report generated successfully!'
+                  : 'Failed to generate PDF report.',
+            ),
+            backgroundColor: success ? AppTheme.success : AppTheme.error,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.error),
+        );
+      }
+    }
   }
 
   void _showAboutDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.account_balance_wallet_rounded,
-                color: Color(0xFF6C63FF)),
-            SizedBox(width: 12),
-            Text('Spendora'),
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: const Color(0xFF0D4A3E),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.account_balance_wallet_rounded,
+                  color: Colors.white, size: 24),
+            ),
+            const SizedBox(width: 12),
+            const Text('Spendora'),
           ],
         ),
         content: const Column(

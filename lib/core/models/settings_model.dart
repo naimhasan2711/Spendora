@@ -17,6 +17,9 @@ class SettingsModel {
   final bool hapticFeedback;
   final DateTime? lastBackupDate;
   final String language;
+  // User Profile fields
+  final String userName;
+  final String? userImagePath;
 
   SettingsModel({
     this.themeModeIndex = 0,
@@ -34,6 +37,8 @@ class SettingsModel {
     this.hapticFeedback = true,
     this.lastBackupDate,
     this.language = 'en',
+    this.userName = 'User',
+    this.userImagePath,
   });
 
   ThemeMode get themeMode {
@@ -68,6 +73,8 @@ class SettingsModel {
     bool? hapticFeedback,
     DateTime? lastBackupDate,
     String? language,
+    String? userName,
+    String? userImagePath,
   }) {
     return SettingsModel(
       themeModeIndex: themeModeIndex ?? this.themeModeIndex,
@@ -85,6 +92,8 @@ class SettingsModel {
       hapticFeedback: hapticFeedback ?? this.hapticFeedback,
       lastBackupDate: lastBackupDate ?? this.lastBackupDate,
       language: language ?? this.language,
+      userName: userName ?? this.userName,
+      userImagePath: userImagePath ?? this.userImagePath,
     );
   }
 
@@ -105,6 +114,8 @@ class SettingsModel {
       'hapticFeedback': hapticFeedback,
       'lastBackupDate': lastBackupDate?.toIso8601String(),
       'language': language,
+      'userName': userName,
+      'userImagePath': userImagePath,
     };
   }
 
@@ -127,6 +138,8 @@ class SettingsModel {
           ? DateTime.parse(json['lastBackupDate'] as String)
           : null,
       language: json['language'] as String? ?? 'en',
+      userName: json['userName'] as String? ?? 'User',
+      userImagePath: json['userImagePath'] as String?,
     );
   }
 }

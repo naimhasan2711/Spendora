@@ -7,6 +7,7 @@ import '../../../core/models/models.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../core/widgets/animated_widgets.dart';
 import '../providers/budgets_provider.dart';
 import '../../categories/providers/categories_provider.dart';
 
@@ -18,10 +19,42 @@ class BudgetsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final budgets = ref.watch(budgetsProvider);
     final activeBudgets = ref.watch(activeBudgetsProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Budgets'),
+        title: Row(
+          children: [
+            const ProfileAvatar(radius: 16),
+            const SizedBox(width: 12),
+            Text(
+              'Budgets',
+              style: context.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : const Color(0xFF0D4A3E),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          // Add Budget Button in AppBar
+          IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: context.colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.add_rounded,
+                color: context.colorScheme.primary,
+                size: 20,
+              ),
+            ),
+            onPressed: () => context.push(AppRoutes.addBudget),
+            tooltip: 'Add Budget',
+          ),
+        ],
       ),
       body: budgets.isEmpty
           ? _buildEmptyState(context)
@@ -30,14 +63,13 @@ class BudgetsScreen extends ConsumerWidget {
               itemCount: activeBudgets.length,
               itemBuilder: (context, index) {
                 final budget = activeBudgets[index];
-                return _BudgetCard(budget: budget);
+                return AnimatedFadeSlide(
+                  delay: Duration(milliseconds: 100 + (index * 50)),
+                  child: _BudgetCard(budget: budget),
+                );
               },
             ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'budgetsFAB',
-        onPressed: () => context.push(AppRoutes.addBudget),
-        child: const Icon(Icons.add),
-      ),
+      // FAB removed to avoid conflict with MainScreen FAB
     );
   }
 
