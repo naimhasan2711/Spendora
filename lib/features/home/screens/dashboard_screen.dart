@@ -188,62 +188,65 @@ class DashboardScreen extends ConsumerWidget {
             ),
           ),
           // Content
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'TOTAL BALANCE',
-                style: context.textTheme.labelSmall?.copyWith(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  letterSpacing: 1.0,
-                  fontWeight: FontWeight.w600,
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'TOTAL BALANCE',
+                  style: context.textTheme.labelSmall?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    letterSpacing: 1.0,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              TweenAnimationBuilder<double>(
-                tween: Tween(begin: 0, end: totalBalance),
-                duration: const Duration(milliseconds: 800),
-                curve: Curves.easeOutCubic,
-                builder: (context, value, child) {
-                  return FittedBox(
-                    fit: BoxFit.scaleDown,
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      AppFormatters.formatCurrency(value),
-                      style: context.textTheme.headlineLarge?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 32,
+                const SizedBox(height: 8),
+                TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: totalBalance),
+                  duration: const Duration(milliseconds: 800),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, value, child) {
+                    return FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        AppFormatters.formatCurrency(value),
+                        style: context.textTheme.headlineLarge?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 32,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _BalanceBadge(
+                        icon: Icons.arrow_downward_rounded,
+                        label: 'Income',
+                        amount: summary.income,
+                        backgroundColor: Colors.white.withValues(alpha: 0.15),
+                        textColor: Colors.white,
                       ),
                     ),
-                  );
-                },
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: _BalanceBadge(
-                      icon: Icons.arrow_downward_rounded,
-                      label: 'Income',
-                      amount: summary.income,
-                      backgroundColor: Colors.white.withValues(alpha: 0.15),
-                      textColor: Colors.white,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _BalanceBadge(
+                        icon: Icons.arrow_upward_rounded,
+                        label: 'Expenses',
+                        amount: summary.expense,
+                        backgroundColor: Colors.white.withValues(alpha: 0.15),
+                        textColor: Colors.white,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _BalanceBadge(
-                      icon: Icons.arrow_upward_rounded,
-                      label: 'Expenses',
-                      amount: summary.expense,
-                      backgroundColor: Colors.white.withValues(alpha: 0.15),
-                      textColor: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),

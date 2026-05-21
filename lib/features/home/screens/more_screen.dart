@@ -184,17 +184,30 @@ class MoreScreen extends ConsumerWidget {
         ),
         Container(
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF252538) : Colors.white,
+            gradient: LinearGradient(
+              colors: isDark
+                  ? [
+                      const Color(0xFF1A3A34),
+                      const Color(0xFF0D524A),
+                      const Color(0xFF0A3D36)
+                    ]
+                  : [
+                      const Color(0xFF0D6B5E),
+                      const Color(0xFF14A085),
+                      const Color(0xFF0D6B5E)
+                    ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              stops: const [0.0, 0.5, 1.0],
+            ),
             borderRadius: BorderRadius.circular(16),
-            boxShadow: isDark
-                ? null
-                : [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF0D6B5E).withValues(alpha: 0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Column(children: children),
         ),
@@ -221,12 +234,12 @@ class MoreScreen extends ConsumerWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: context.colorScheme.primary.withValues(alpha: 0.1),
+                color: Colors.white.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: context.colorScheme.primary,
+                color: Colors.white,
                 size: 22,
               ),
             ),
@@ -241,6 +254,7 @@ class MoreScreen extends ConsumerWidget {
                         title,
                         style: context.textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                       ),
                       if (badge != null) ...[
@@ -251,7 +265,7 @@ class MoreScreen extends ConsumerWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: context.colorScheme.primary,
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
@@ -270,8 +284,7 @@ class MoreScreen extends ConsumerWidget {
                   Text(
                     subtitle,
                     style: context.textTheme.bodySmall?.copyWith(
-                      color:
-                          context.colorScheme.onSurface.withValues(alpha: 0.6),
+                      color: Colors.white.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -279,7 +292,7 @@ class MoreScreen extends ConsumerWidget {
             ),
             Icon(
               Icons.chevron_right_rounded,
-              color: context.colorScheme.onSurface.withValues(alpha: 0.4),
+              color: Colors.white.withValues(alpha: 0.7),
             ),
           ],
         ),

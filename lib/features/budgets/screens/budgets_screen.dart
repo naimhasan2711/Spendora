@@ -124,6 +124,7 @@ class _BudgetCard extends ConsumerWidget {
     final category = budget.categoryId != null
         ? ref.watch(categoryByIdProvider(budget.categoryId!))
         : null;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final spent = budget.spent;
     final limit = budget.amount;
@@ -140,8 +141,34 @@ class _BudgetCard extends ConsumerWidget {
       progressColor = AppTheme.error;
     }
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isDark
+              ? [
+                  const Color(0xFF1A3A34),
+                  const Color(0xFF0D524A),
+                  const Color(0xFF0A3D36)
+                ]
+              : [
+                  const Color(0xFF0D6B5E),
+                  const Color(0xFF14A085),
+                  const Color(0xFF0D6B5E)
+                ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0.0, 0.5, 1.0],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0D6B5E).withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
       child: InkWell(
         onTap: () {
           // Show budget details
@@ -159,9 +186,7 @@ class _BudgetCard extends ConsumerWidget {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: category != null
-                          ? Color(category.colorValue).withValues(alpha: 0.15)
-                          : progressColor.withValues(alpha: 0.15),
+                      color: Colors.white.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     child: Icon(
@@ -169,9 +194,7 @@ class _BudgetCard extends ConsumerWidget {
                           ? IconData(category.iconCodePoint,
                               fontFamily: 'MaterialIcons')
                           : Icons.pie_chart_rounded,
-                      color: category != null
-                          ? Color(category.colorValue)
-                          : progressColor,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -183,13 +206,13 @@ class _BudgetCard extends ConsumerWidget {
                           budget.name,
                           style: context.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
+                            color: Colors.white,
                           ),
                         ),
                         Text(
                           _getPeriodLabel(budget.period),
                           style: context.textTheme.bodySmall?.copyWith(
-                            color: context.colorScheme.onSurface
-                                .withValues(alpha: 0.6),
+                            color: Colors.white.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -200,13 +223,13 @@ class _BudgetCard extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppTheme.error.withValues(alpha: 0.1),
+                        color: AppTheme.error.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         'Over Budget',
                         style: context.textTheme.labelSmall?.copyWith(
-                          color: AppTheme.error,
+                          color: Colors.white,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -219,8 +242,7 @@ class _BudgetCard extends ConsumerWidget {
               LinearPercentIndicator(
                 lineHeight: 12,
                 percent: progress,
-                backgroundColor:
-                    context.colorScheme.outline.withValues(alpha: 0.1),
+                backgroundColor: Colors.white.withValues(alpha: 0.2),
                 progressColor: progressColor,
                 barRadius: const Radius.circular(6),
                 padding: EdgeInsets.zero,
@@ -238,14 +260,14 @@ class _BudgetCard extends ConsumerWidget {
                       Text(
                         'Spent',
                         style: context.textTheme.labelSmall?.copyWith(
-                          color: context.colorScheme.onSurface
-                              .withValues(alpha: 0.5),
+                          color: Colors.white.withValues(alpha: 0.7),
                         ),
                       ),
                       Text(
                         AppFormatters.formatCurrency(spent),
                         style: context.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                     ],
@@ -256,8 +278,7 @@ class _BudgetCard extends ConsumerWidget {
                       Text(
                         'Remaining',
                         style: context.textTheme.labelSmall?.copyWith(
-                          color: context.colorScheme.onSurface
-                              .withValues(alpha: 0.5),
+                          color: Colors.white.withValues(alpha: 0.7),
                         ),
                       ),
                       Text(
@@ -276,14 +297,14 @@ class _BudgetCard extends ConsumerWidget {
                       Text(
                         'Budget',
                         style: context.textTheme.labelSmall?.copyWith(
-                          color: context.colorScheme.onSurface
-                              .withValues(alpha: 0.5),
+                          color: Colors.white.withValues(alpha: 0.7),
                         ),
                       ),
                       Text(
                         AppFormatters.formatCurrency(limit),
                         style: context.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                     ],

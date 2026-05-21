@@ -6,6 +6,7 @@ import '../../../core/models/models.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../core/widgets/glossy_card.dart';
 import '../../transactions/providers/transactions_provider.dart';
 import '../../categories/providers/categories_provider.dart';
 import '../../accounts/providers/accounts_provider.dart';
@@ -20,19 +21,8 @@ class RecentTransactionsCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final transactions = ref.watch(recentTransactionsProvider);
 
-    return Container(
+    return GlossyCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
       child: Column(
         children: [
           Row(
@@ -42,10 +32,14 @@ class RecentTransactionsCard extends ConsumerWidget {
                 'Recent Transactions',
                 style: context.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
               TextButton(
                 onPressed: () => context.push(AppRoutes.allTransactions),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white.withValues(alpha: 0.9),
+                ),
                 child: const Text('See All'),
               ),
             ],
@@ -70,20 +64,20 @@ class RecentTransactionsCard extends ConsumerWidget {
           Icon(
             Icons.receipt_long_outlined,
             size: 48,
-            color: context.colorScheme.onSurface.withValues(alpha: 0.3),
+            color: Colors.white.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 12),
           Text(
             'No transactions yet',
             style: context.textTheme.bodyMedium?.copyWith(
-              color: context.colorScheme.onSurface.withValues(alpha: 0.6),
+              color: Colors.white.withValues(alpha: 0.8),
             ),
           ),
           const SizedBox(height: 4),
           Text(
             'Tap the + button to add your first transaction',
             style: context.textTheme.bodySmall?.copyWith(
-              color: context.colorScheme.onSurface.withValues(alpha: 0.4),
+              color: Colors.white.withValues(alpha: 0.6),
             ),
             textAlign: TextAlign.center,
           ),
@@ -115,14 +109,10 @@ class _TransactionTile extends ConsumerWidget {
         margin: const EdgeInsets.symmetric(vertical: 4),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: context.isDarkMode
-              ? Colors.white.withValues(alpha: 0.03)
-              : Colors.black.withValues(alpha: 0.02),
+          color: Colors.white.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: context.isDarkMode
-                ? Colors.white.withValues(alpha: 0.05)
-                : Colors.black.withValues(alpha: 0.03),
+            color: Colors.white.withValues(alpha: 0.1),
           ),
         ),
         child: Row(
@@ -132,18 +122,7 @@ class _TransactionTile extends ConsumerWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    category != null
-                        ? Color(category.colorValue).withValues(alpha: 0.25)
-                        : Colors.grey.withValues(alpha: 0.25),
-                    category != null
-                        ? Color(category.colorValue).withValues(alpha: 0.1)
-                        : Colors.grey.withValues(alpha: 0.1),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                color: Colors.white.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
@@ -151,8 +130,7 @@ class _TransactionTile extends ConsumerWidget {
                     ? IconData(category.iconCodePoint,
                         fontFamily: 'MaterialIcons')
                     : Icons.category,
-                color:
-                    category != null ? Color(category.colorValue) : Colors.grey,
+                color: Colors.white,
                 size: 24,
               ),
             ),
@@ -167,6 +145,7 @@ class _TransactionTile extends ConsumerWidget {
                     category?.name ?? 'Unknown',
                     style: context.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -177,14 +156,13 @@ class _TransactionTile extends ConsumerWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: Color(account.colorValue)
-                                .withValues(alpha: 0.1),
+                            color: Colors.white.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             account.name,
                             style: context.textTheme.labelSmall?.copyWith(
-                              color: Color(account.colorValue),
+                              color: Colors.white.withValues(alpha: 0.9),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -194,8 +172,7 @@ class _TransactionTile extends ConsumerWidget {
                       Text(
                         AppFormatters.formatRelativeDate(transaction.dateTime),
                         style: context.textTheme.bodySmall?.copyWith(
-                          color: context.colorScheme.onSurface
-                              .withValues(alpha: 0.5),
+                          color: Colors.white.withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -208,7 +185,7 @@ class _TransactionTile extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
+                color: color.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(

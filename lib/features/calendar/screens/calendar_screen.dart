@@ -245,11 +245,37 @@ class _TransactionItem extends ConsumerWidget {
     final account = ref.watch(accountByIdProvider(transaction.accountId));
 
     final isExpense = transaction.type == TransactionType.expense;
-    final color = isExpense ? AppTheme.expense : AppTheme.income;
     final sign = isExpense ? '-' : '+';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isDark
+              ? [
+                  const Color(0xFF1A3A34),
+                  const Color(0xFF0D524A),
+                  const Color(0xFF0A3D36)
+                ]
+              : [
+                  const Color(0xFF0D6B5E),
+                  const Color(0xFF14A085),
+                  const Color(0xFF0D6B5E)
+                ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0.0, 0.5, 1.0],
+        ),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0D6B5E).withValues(alpha: 0.2),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: InkWell(
         onTap: () => context.push('/transaction/${transaction.id}'),
         borderRadius: BorderRadius.circular(12),
@@ -261,9 +287,7 @@ class _TransactionItem extends ConsumerWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: category != null
-                      ? Color(category.colorValue).withValues(alpha: 0.15)
-                      : Colors.grey.withValues(alpha: 0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
@@ -271,9 +295,7 @@ class _TransactionItem extends ConsumerWidget {
                       ? IconData(category.iconCodePoint,
                           fontFamily: 'MaterialIcons')
                       : Icons.category,
-                  color: category != null
-                      ? Color(category.colorValue)
-                      : Colors.grey,
+                  color: Colors.white,
                   size: 20,
                 ),
               ),
@@ -286,13 +308,13 @@ class _TransactionItem extends ConsumerWidget {
                       category?.name ?? 'Unknown',
                       style: context.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
                     ),
                     Text(
                       '${account?.name ?? ''} • ${AppFormatters.formatTime(transaction.dateTime)}',
                       style: context.textTheme.bodySmall?.copyWith(
-                        color: context.colorScheme.onSurface
-                            .withValues(alpha: 0.6),
+                        color: Colors.white.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -302,7 +324,9 @@ class _TransactionItem extends ConsumerWidget {
                 '$sign${AppFormatters.formatCurrency(transaction.amount)}',
                 style: context.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: color,
+                  color: isExpense
+                      ? const Color(0xFFFF6B6B)
+                      : const Color(0xFF7FFF7F),
                 ),
               ),
             ],

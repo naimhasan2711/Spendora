@@ -405,17 +405,30 @@ class _IncomeExpensesCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF252538) : Colors.white,
+        gradient: LinearGradient(
+          colors: isDark
+              ? [
+                  const Color(0xFF1A3A34),
+                  const Color(0xFF0D524A),
+                  const Color(0xFF0A3D36)
+                ]
+              : [
+                  const Color(0xFF0D6B5E),
+                  const Color(0xFF14A085),
+                  const Color(0xFF0D6B5E)
+                ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0.0, 0.5, 1.0],
+        ),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0D6B5E).withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -431,6 +444,7 @@ class _IncomeExpensesCard extends ConsumerWidget {
                     'Income vs Expenses',
                     style: context.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -439,8 +453,7 @@ class _IncomeExpensesCard extends ConsumerWidget {
                       Text(
                         'Net Balance: ',
                         style: context.textTheme.bodySmall?.copyWith(
-                          color: context.colorScheme.onSurface
-                              .withValues(alpha: 0.6),
+                          color: Colors.white.withValues(alpha: 0.7),
                         ),
                       ),
                       Text(
@@ -464,13 +477,15 @@ class _IncomeExpensesCard extends ConsumerWidget {
           Row(
             children: [
               _LegendItem(
-                color: const Color(0xFF0D4A3E),
+                color: Colors.white,
                 label: 'Expenses',
+                isOnDarkBg: true,
               ),
               const SizedBox(width: 16),
               _LegendItem(
                 color: const Color(0xFFB8D4CE),
                 label: 'Income',
+                isOnDarkBg: true,
               ),
             ],
           ),
@@ -630,10 +645,12 @@ class _IncomeExpensesCard extends ConsumerWidget {
 class _LegendItem extends StatelessWidget {
   final Color color;
   final String label;
+  final bool isOnDarkBg;
 
   const _LegendItem({
     required this.color,
     required this.label,
+    this.isOnDarkBg = false,
   });
 
   @override
@@ -653,7 +670,9 @@ class _LegendItem extends StatelessWidget {
         Text(
           label,
           style: context.textTheme.bodySmall?.copyWith(
-            color: context.colorScheme.onSurface.withValues(alpha: 0.6),
+            color: isOnDarkBg
+                ? Colors.white.withValues(alpha: 0.8)
+                : context.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
       ],
@@ -944,17 +963,30 @@ class _AvgDailySpendingCard extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF252538) : Colors.white,
+        gradient: LinearGradient(
+          colors: isDark
+              ? [
+                  const Color(0xFF1A3A34),
+                  const Color(0xFF0D524A),
+                  const Color(0xFF0A3D36)
+                ]
+              : [
+                  const Color(0xFF0D6B5E),
+                  const Color(0xFF14A085),
+                  const Color(0xFF0D6B5E)
+                ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0.0, 0.5, 1.0],
+        ),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0D6B5E).withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -962,12 +994,12 @@ class _AvgDailySpendingCard extends ConsumerWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: context.colorScheme.primary.withValues(alpha: 0.1),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.trending_up_rounded,
-              color: context.colorScheme.primary,
+              color: Colors.white,
               size: 24,
             ),
           ),
@@ -979,7 +1011,7 @@ class _AvgDailySpendingCard extends ConsumerWidget {
                 Text(
                   'Avg. Daily Spending',
                   style: context.textTheme.bodyMedium?.copyWith(
-                    color: context.colorScheme.onSurface.withValues(alpha: 0.6),
+                    color: Colors.white.withValues(alpha: 0.8),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -987,6 +1019,7 @@ class _AvgDailySpendingCard extends ConsumerWidget {
                   AppFormatters.formatCurrency(avgDaily),
                   style: context.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -1040,17 +1073,30 @@ class _ReportOptionTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF252538) : Colors.white,
+          gradient: LinearGradient(
+            colors: isDark
+                ? [
+                    const Color(0xFF1A3A34),
+                    const Color(0xFF0D524A),
+                    const Color(0xFF0A3D36)
+                  ]
+                : [
+                    const Color(0xFF0D6B5E),
+                    const Color(0xFF14A085),
+                    const Color(0xFF0D6B5E)
+                  ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            stops: const [0.0, 0.5, 1.0],
+          ),
           borderRadius: BorderRadius.circular(16),
-          boxShadow: isDark
-              ? null
-              : [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0D6B5E).withValues(alpha: 0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
           children: [
@@ -1058,12 +1104,12 @@ class _ReportOptionTile extends StatelessWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.1),
+                color: Colors.white.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
-                color: iconColor,
+                color: Colors.white,
                 size: 24,
               ),
             ),
@@ -1076,13 +1122,13 @@ class _ReportOptionTile extends StatelessWidget {
                     title,
                     style: context.textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w600,
+                      color: Colors.white,
                     ),
                   ),
                   Text(
                     subtitle,
                     style: context.textTheme.bodySmall?.copyWith(
-                      color:
-                          context.colorScheme.onSurface.withValues(alpha: 0.6),
+                      color: Colors.white.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -1090,7 +1136,7 @@ class _ReportOptionTile extends StatelessWidget {
             ),
             Icon(
               Icons.chevron_right_rounded,
-              color: context.colorScheme.onSurface.withValues(alpha: 0.4),
+              color: Colors.white.withValues(alpha: 0.7),
             ),
           ],
         ),
@@ -1167,17 +1213,30 @@ class _TopCategoriesSection extends ConsumerWidget {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF252538) : Colors.white,
+                gradient: LinearGradient(
+                  colors: isDark
+                      ? [
+                          const Color(0xFF1A3A34),
+                          const Color(0xFF0D524A),
+                          const Color(0xFF0A3D36)
+                        ]
+                      : [
+                          const Color(0xFF0D6B5E),
+                          const Color(0xFF14A085),
+                          const Color(0xFF0D6B5E)
+                        ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  stops: const [0.0, 0.5, 1.0],
+                ),
                 borderRadius: BorderRadius.circular(16),
-                boxShadow: isDark
-                    ? null
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0D6B5E).withValues(alpha: 0.2),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: Column(
                 children: [
@@ -1187,14 +1246,13 @@ class _TopCategoriesSection extends ConsumerWidget {
                         width: 44,
                         height: 44,
                         decoration: BoxDecoration(
-                          color:
-                              Color(category.colorValue).withValues(alpha: 0.1),
+                          color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
                           IconData(category.iconCodePoint,
                               fontFamily: 'MaterialIcons'),
-                          color: Color(category.colorValue),
+                          color: Colors.white,
                           size: 22,
                         ),
                       ),
@@ -1204,6 +1262,7 @@ class _TopCategoriesSection extends ConsumerWidget {
                           category.name,
                           style: context.textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.w500,
+                            color: Colors.white,
                           ),
                         ),
                       ),
@@ -1211,6 +1270,7 @@ class _TopCategoriesSection extends ConsumerWidget {
                         AppFormatters.formatCurrency(entry.value),
                         style: context.textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                     ],
@@ -1220,10 +1280,9 @@ class _TopCategoriesSection extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: progress,
-                      backgroundColor:
-                          context.colorScheme.onSurface.withValues(alpha: 0.1),
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Color(category.colorValue),
+                      backgroundColor: Colors.white.withValues(alpha: 0.2),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Colors.white,
                       ),
                       minHeight: 6,
                     ),

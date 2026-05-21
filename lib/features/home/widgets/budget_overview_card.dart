@@ -7,6 +7,7 @@ import '../../../core/models/models.dart';
 import '../../../core/router/app_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../core/widgets/glossy_card.dart';
 import '../../budgets/providers/budgets_provider.dart';
 import '../../categories/providers/categories_provider.dart';
 
@@ -21,19 +22,8 @@ class BudgetOverviewCard extends ConsumerWidget {
     final budgets = ref.watch(monthlyBudgetsProvider(month));
     final activeBudgets = budgets.where((b) => b.isActive).toList();
 
-    return Container(
+    return GlossyCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -44,10 +34,14 @@ class BudgetOverviewCard extends ConsumerWidget {
                 'Budget Overview',
                 style: context.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
               TextButton(
                 onPressed: () => context.push(AppRoutes.budgets),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white.withValues(alpha: 0.9),
+                ),
                 child: const Text('See All'),
               ),
             ],
@@ -74,28 +68,32 @@ class BudgetOverviewCard extends ConsumerWidget {
             Icon(
               Icons.pie_chart_outline,
               size: 48,
-              color: context.colorScheme.onSurface.withValues(alpha: 0.3),
+              color: Colors.white.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 12),
             Text(
               'No budgets set',
               style: context.textTheme.bodyMedium?.copyWith(
-                color: context.colorScheme.onSurface.withValues(alpha: 0.6),
+                color: Colors.white.withValues(alpha: 0.8),
               ),
             ),
             const SizedBox(height: 4),
             Text(
               'Create a budget to track your spending',
               style: context.textTheme.bodySmall?.copyWith(
-                color: context.colorScheme.onSurface.withValues(alpha: 0.4),
+                color: Colors.white.withValues(alpha: 0.6),
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             OutlinedButton.icon(
               onPressed: () => context.push(AppRoutes.addBudget),
-              icon: const Icon(Icons.add),
+              icon: const Icon(Icons.add, color: Colors.white),
               label: const Text('Create Budget'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white,
+                side: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
+              ),
             ),
           ],
         ),
@@ -131,10 +129,7 @@ class _BudgetProgressTile extends ConsumerWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: (category != null
-                          ? Color(category.colorValue)
-                          : context.colorScheme.primary)
-                      .withValues(alpha: 0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -142,9 +137,7 @@ class _BudgetProgressTile extends ConsumerWidget {
                       ? IconData(category.iconCodePoint,
                           fontFamily: 'MaterialIcons')
                       : Icons.account_balance_wallet,
-                  color: category != null
-                      ? Color(category.colorValue)
-                      : context.colorScheme.primary,
+                  color: Colors.white,
                   size: 16,
                 ),
               ),
@@ -158,6 +151,7 @@ class _BudgetProgressTile extends ConsumerWidget {
                       : category?.name ?? budget.name,
                   style: context.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -176,8 +170,7 @@ class _BudgetProgressTile extends ConsumerWidget {
                   Text(
                     'of ${AppFormatters.formatCurrency(budget.amount)}',
                     style: context.textTheme.labelSmall?.copyWith(
-                      color:
-                          context.colorScheme.onSurface.withValues(alpha: 0.5),
+                      color: Colors.white.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -190,7 +183,7 @@ class _BudgetProgressTile extends ConsumerWidget {
           LinearPercentIndicator(
             lineHeight: 8,
             percent: progress.clamp(0.0, 1.0),
-            backgroundColor: context.colorScheme.outline.withValues(alpha: 0.2),
+            backgroundColor: Colors.white.withValues(alpha: 0.2),
             progressColor: color,
             barRadius: const Radius.circular(4),
             padding: EdgeInsets.zero,

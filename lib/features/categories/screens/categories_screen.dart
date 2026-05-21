@@ -81,25 +81,56 @@ class _CategoryList extends StatelessWidget {
       },
       itemBuilder: (context, index) {
         final category = categories[index];
-        return Card(
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return Container(
           key: ValueKey(category.id),
           margin: const EdgeInsets.only(bottom: 8),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: isDark
+                  ? [
+                      const Color(0xFF1A3A34),
+                      const Color(0xFF0D524A),
+                      const Color(0xFF0A3D36)
+                    ]
+                  : [
+                      const Color(0xFF0D6B5E),
+                      const Color(0xFF14A085),
+                      const Color(0xFF0D6B5E)
+                    ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              stops: const [0.0, 0.5, 1.0],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF0D6B5E).withValues(alpha: 0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
           child: ListTile(
             leading: Container(
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: Color(category.colorValue).withValues(alpha: 0.15),
+                color: Colors.white.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 IconData(category.iconCodePoint, fontFamily: 'MaterialIcons'),
-                color: Color(category.colorValue),
+                color: Colors.white,
               ),
             ),
-            title: Text(category.name),
+            title: Text(category.name,
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w600)),
             subtitle: category.subcategories.isNotEmpty
-                ? Text('${category.subcategories.length} subcategories')
+                ? Text('${category.subcategories.length} subcategories',
+                    style:
+                        TextStyle(color: Colors.white.withValues(alpha: 0.7)))
                 : null,
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
@@ -109,18 +140,18 @@ class _CategoryList extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      color: context.colorScheme.primary.withValues(alpha: 0.1),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       'Default',
                       style: context.textTheme.labelSmall?.copyWith(
-                        color: context.colorScheme.primary,
+                        color: Colors.white,
                       ),
                     ),
                   ),
                 const SizedBox(width: 8),
-                const Icon(Icons.drag_handle),
+                const Icon(Icons.drag_handle, color: Colors.white70),
               ],
             ),
             onTap: () {

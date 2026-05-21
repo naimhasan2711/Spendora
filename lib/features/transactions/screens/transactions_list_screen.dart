@@ -334,11 +334,6 @@ class _TransactionCard extends ConsumerWidget {
     final amountColor = isExpense ? AppTheme.expense : AppTheme.income;
     final sign = isExpense ? '-' : '+';
 
-    // Get category color or default
-    final iconColor = category != null
-        ? Color(category.colorValue)
-        : (isExpense ? AppTheme.expense : AppTheme.income);
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Slidable(
@@ -368,20 +363,30 @@ class _TransactionCard extends ConsumerWidget {
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF252538) : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: context.colorScheme.onSurface.withValues(alpha: 0.05),
+              gradient: LinearGradient(
+                colors: isDark
+                    ? [
+                        const Color(0xFF1A3A34),
+                        const Color(0xFF0D524A),
+                        const Color(0xFF0A3D36),
+                      ]
+                    : [
+                        const Color(0xFF0D6B5E),
+                        const Color(0xFF14A085),
+                        const Color(0xFF0D6B5E),
+                      ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                stops: const [0.0, 0.5, 1.0],
               ),
-              boxShadow: isDark
-                  ? null
-                  : [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF0D6B5E).withValues(alpha: 0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -390,7 +395,7 @@ class _TransactionCard extends ConsumerWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: iconColor.withValues(alpha: 0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -398,7 +403,7 @@ class _TransactionCard extends ConsumerWidget {
                         ? IconData(category.iconCodePoint,
                             fontFamily: 'MaterialIcons')
                         : (isExpense ? Icons.shopping_bag : Icons.attach_money),
-                    color: iconColor,
+                    color: Colors.white,
                     size: 24,
                   ),
                 ),
@@ -415,6 +420,7 @@ class _TransactionCard extends ConsumerWidget {
                             : (category?.name ?? 'Transaction'),
                         style: context.textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w600,
+                          color: Colors.white,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -423,8 +429,7 @@ class _TransactionCard extends ConsumerWidget {
                       Text(
                         '${category?.name ?? 'Unknown'} • ${AppFormatters.formatTime(transaction.dateTime)}',
                         style: context.textTheme.bodySmall?.copyWith(
-                          color: context.colorScheme.onSurface
-                              .withValues(alpha: 0.5),
+                          color: Colors.white.withValues(alpha: 0.7),
                         ),
                       ),
                     ],
@@ -432,11 +437,19 @@ class _TransactionCard extends ConsumerWidget {
                 ),
 
                 // Amount
-                Text(
-                  '$sign${AppFormatters.formatCurrency(transaction.amount)}',
-                  style: context.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: amountColor,
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: amountColor.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    '$sign${AppFormatters.formatCurrency(transaction.amount)}',
+                    style: context.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: amountColor,
+                    ),
                   ),
                 ),
               ],

@@ -5,6 +5,7 @@ import 'package:fl_chart/fl_chart.dart';
 import '../../../core/models/models.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/formatters.dart';
+import '../../../core/widgets/glossy_card.dart';
 import '../../transactions/providers/transactions_provider.dart';
 
 /// Spending Chart Card - Bar chart showing weekly spending trend
@@ -17,23 +18,9 @@ class SpendingChartCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final transactions = ref.watch(monthlyTransactionsProvider(month));
     final weeklyData = _calculateWeeklySpending(transactions);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Container(
+    return GlossyCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF252538) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -45,19 +32,20 @@ class SpendingChartCard extends ConsumerWidget {
                 'Weekly Trend',
                 style: context.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: context.colorScheme.onSurface.withValues(alpha: 0.08),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   'Last 7 Days',
                   style: context.textTheme.labelSmall?.copyWith(
-                    color: context.colorScheme.onSurface.withValues(alpha: 0.6),
+                    color: Colors.white.withValues(alpha: 0.8),
                   ),
                 ),
               ),
@@ -162,8 +150,7 @@ class SpendingChartCard extends ConsumerWidget {
                   child: Text(
                     dayLabels[index],
                     style: context.textTheme.labelSmall?.copyWith(
-                      color:
-                          context.colorScheme.onSurface.withValues(alpha: 0.5),
+                      color: Colors.white.withValues(alpha: 0.7),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -192,7 +179,7 @@ class SpendingChartCard extends ConsumerWidget {
               backDrawRodData: BackgroundBarChartRodData(
                 show: true,
                 toY: maxY > 0 ? maxY : 1000,
-                color: context.colorScheme.onSurface.withValues(alpha: 0.05),
+                color: Colors.white.withValues(alpha: 0.1),
               ),
             ),
           ],
@@ -230,13 +217,13 @@ class SpendingChartCard extends ConsumerWidget {
           Icon(
             Icons.bar_chart_rounded,
             size: 48,
-            color: context.colorScheme.onSurface.withValues(alpha: 0.3),
+            color: Colors.white.withValues(alpha: 0.5),
           ),
           const SizedBox(height: 8),
           Text(
             'No spending this week',
             style: context.textTheme.bodyMedium?.copyWith(
-              color: context.colorScheme.onSurface.withValues(alpha: 0.5),
+              color: Colors.white.withValues(alpha: 0.7),
             ),
           ),
         ],

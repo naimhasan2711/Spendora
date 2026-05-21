@@ -528,17 +528,30 @@ class _SettingsCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF252538) : Colors.white,
+        gradient: LinearGradient(
+          colors: isDark
+              ? [
+                  const Color(0xFF1A3A34),
+                  const Color(0xFF0D524A),
+                  const Color(0xFF0A3D36)
+                ]
+              : [
+                  const Color(0xFF0D6B5E),
+                  const Color(0xFF14A085),
+                  const Color(0xFF0D6B5E)
+                ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0.0, 0.5, 1.0],
+        ),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0D6B5E).withValues(alpha: 0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -548,7 +561,7 @@ class _SettingsCard extends StatelessWidget {
               Divider(
                 height: 1,
                 indent: 72,
-                color: context.colorScheme.onSurface.withValues(alpha: 0.1),
+                color: Colors.white.withValues(alpha: 0.2),
               ),
           ],
         ],
@@ -583,17 +596,19 @@ class _SettingsToggleTile extends StatelessWidget {
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: iconColor.withValues(alpha: 0.1),
+          color: Colors.white.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(icon, color: iconColor, size: 22),
+        child: Icon(icon, color: Colors.white, size: 22),
       ),
-      title: Text(title),
-      subtitle: Text(subtitle),
+      title: Text(title, style: const TextStyle(color: Colors.white)),
+      subtitle: Text(subtitle,
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.7))),
       trailing: Switch(
         value: value,
         onChanged: onChanged,
-        activeColor: context.colorScheme.primary,
+        activeColor: Colors.white,
+        activeTrackColor: Colors.white.withValues(alpha: 0.3),
       ),
     );
   }
@@ -623,25 +638,25 @@ class _SettingsDropdownTile extends StatelessWidget {
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: iconColor.withValues(alpha: 0.1),
+          color: Colors.white.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(icon, color: iconColor, size: 22),
+        child: Icon(icon, color: Colors.white, size: 22),
       ),
-      title: Text(title),
+      title: Text(title, style: const TextStyle(color: Colors.white)),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             value,
             style: context.textTheme.bodyMedium?.copyWith(
-              color: context.colorScheme.onSurface.withValues(alpha: 0.6),
+              color: Colors.white.withValues(alpha: 0.7),
             ),
           ),
           const SizedBox(width: 4),
           Icon(
             Icons.keyboard_arrow_down_rounded,
-            color: context.colorScheme.onSurface.withValues(alpha: 0.4),
+            color: Colors.white.withValues(alpha: 0.7),
           ),
         ],
       ),
@@ -676,16 +691,19 @@ class _SettingsActionTile extends StatelessWidget {
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: iconColor.withValues(alpha: 0.1),
+          color: Colors.white.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(icon, color: iconColor, size: 22),
+        child: Icon(icon, color: Colors.white, size: 22),
       ),
-      title: Text(title),
-      subtitle: subtitle != null ? Text(subtitle!) : null,
+      title: Text(title, style: const TextStyle(color: Colors.white)),
+      subtitle: subtitle != null
+          ? Text(subtitle!,
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.7)))
+          : null,
       trailing: Icon(
         showExternalIcon ? Icons.open_in_new_rounded : Icons.chevron_right,
-        color: context.colorScheme.onSurface.withValues(alpha: 0.4),
+        color: Colors.white.withValues(alpha: 0.7),
         size: 20,
       ),
       onTap: onTap,

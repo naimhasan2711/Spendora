@@ -113,8 +113,36 @@ class _AccountCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isDark
+              ? [
+                  const Color(0xFF1A3A34),
+                  const Color(0xFF0D524A),
+                  const Color(0xFF0A3D36)
+                ]
+              : [
+                  const Color(0xFF0D6B5E),
+                  const Color(0xFF14A085),
+                  const Color(0xFF0D6B5E)
+                ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0.0, 0.5, 1.0],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0D6B5E).withValues(alpha: 0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: InkWell(
         onTap: () {
           // Show account transactions
@@ -128,12 +156,12 @@ class _AccountCard extends ConsumerWidget {
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
-                  color: Color(account.colorValue).withValues(alpha: 0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
                   IconData(account.iconCodePoint, fontFamily: 'MaterialIcons'),
-                  color: Color(account.colorValue),
+                  color: Colors.white,
                   size: 28,
                 ),
               ),
@@ -148,6 +176,7 @@ class _AccountCard extends ConsumerWidget {
                           account.name,
                           style: context.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
+                            color: Colors.white,
                           ),
                         ),
                         if (account.isDefault) ...[
@@ -158,14 +187,13 @@ class _AccountCard extends ConsumerWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: context.colorScheme.primary
-                                  .withValues(alpha: 0.1),
+                              color: Colors.white.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
                               'Default',
                               style: context.textTheme.labelSmall?.copyWith(
-                                color: context.colorScheme.primary,
+                                color: Colors.white,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -177,8 +205,7 @@ class _AccountCard extends ConsumerWidget {
                     Text(
                       _getAccountTypeLabel(account.type),
                       style: context.textTheme.bodySmall?.copyWith(
-                        color: context.colorScheme.onSurface
-                            .withValues(alpha: 0.6),
+                        color: Colors.white.withValues(alpha: 0.7),
                       ),
                     ),
                   ],
@@ -192,16 +219,15 @@ class _AccountCard extends ConsumerWidget {
                     style: context.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       color: account.balance >= 0
-                          ? AppTheme.income
-                          : AppTheme.expense,
+                          ? const Color(0xFF7FFF7F)
+                          : const Color(0xFFFF6B6B),
                     ),
                   ),
                   if (account.excludeFromTotal)
                     Text(
                       'Excluded',
                       style: context.textTheme.labelSmall?.copyWith(
-                        color: context.colorScheme.onSurface
-                            .withValues(alpha: 0.5),
+                        color: Colors.white.withValues(alpha: 0.6),
                       ),
                     ),
                 ],

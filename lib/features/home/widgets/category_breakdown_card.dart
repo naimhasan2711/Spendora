@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 
 import '../../../core/models/models.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/glossy_card.dart';
 import '../../transactions/providers/transactions_provider.dart';
 import '../../categories/providers/categories_provider.dart';
 
@@ -29,19 +30,9 @@ class CategoryBreakdownCard extends ConsumerWidget {
     final topEntries = sortedEntries.take(6).toList();
     final totalExpense = categorySpending.values.fold(0.0, (a, b) => a + b);
 
-    return Container(
+    return GlossyCard(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
+      borderRadius: 24,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -52,19 +43,20 @@ class CategoryBreakdownCard extends ConsumerWidget {
                 'Spending by Category',
                 style: context.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: context.colorScheme.primary.withValues(alpha: 0.1),
+                  color: Colors.white.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   '${topEntries.length} categories',
                   style: context.textTheme.labelSmall?.copyWith(
-                    color: context.colorScheme.primary,
+                    color: Colors.white,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -145,6 +137,7 @@ class CategoryBreakdownCard extends ConsumerWidget {
                               category?.name ?? 'Other',
                               style: context.textTheme.bodySmall?.copyWith(
                                 fontWeight: FontWeight.w500,
+                                color: Colors.white,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -153,14 +146,14 @@ class CategoryBreakdownCard extends ConsumerWidget {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: catColor.withValues(alpha: 0.1),
+                              color: Colors.white.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               '${percentage.toStringAsFixed(0)}%',
                               style: context.textTheme.labelSmall?.copyWith(
                                 fontWeight: FontWeight.w700,
-                                color: catColor,
+                                color: Colors.white,
                               ),
                             ),
                           ),
@@ -178,19 +171,8 @@ class CategoryBreakdownCard extends ConsumerWidget {
   }
 
   Widget _buildEmptyCard(BuildContext context) {
-    return Container(
+    return GlossyCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -198,6 +180,7 @@ class CategoryBreakdownCard extends ConsumerWidget {
             'Spending by Category',
             style: context.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 32),
@@ -207,13 +190,13 @@ class CategoryBreakdownCard extends ConsumerWidget {
                 Icon(
                   Icons.pie_chart_outline_rounded,
                   size: 48,
-                  color: context.colorScheme.onSurface.withValues(alpha: 0.3),
+                  color: Colors.white.withValues(alpha: 0.5),
                 ),
                 const SizedBox(height: 12),
                 Text(
                   'No expenses this month',
                   style: context.textTheme.bodyMedium?.copyWith(
-                    color: context.colorScheme.onSurface.withValues(alpha: 0.5),
+                    color: Colors.white.withValues(alpha: 0.7),
                   ),
                 ),
               ],

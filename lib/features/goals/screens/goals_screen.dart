@@ -100,6 +100,7 @@ class _GoalCard extends StatelessWidget {
     final target = goal.targetAmount;
     final progress = (saved / target).clamp(0.0, 1.0);
     final isCompleted = saved >= target;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Calculate days remaining
     int? daysRemaining;
@@ -107,8 +108,34 @@ class _GoalCard extends StatelessWidget {
       daysRemaining = goal.targetDate!.difference(DateTime.now()).inDays;
     }
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isDark
+              ? [
+                  const Color(0xFF1A3A34),
+                  const Color(0xFF0D524A),
+                  const Color(0xFF0A3D36)
+                ]
+              : [
+                  const Color(0xFF0D6B5E),
+                  const Color(0xFF14A085),
+                  const Color(0xFF0D6B5E)
+                ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          stops: const [0.0, 0.5, 1.0],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0D6B5E).withValues(alpha: 0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: InkWell(
         onTap: () {
           _showGoalDetails(context, goal);
@@ -124,11 +151,11 @@ class _GoalCard extends StatelessWidget {
                 child: Container(
                   height: 120,
                   width: double.infinity,
-                  color: Color(goal.colorValue).withValues(alpha: 0.2),
+                  color: Colors.white.withValues(alpha: 0.1),
                   child: Icon(
                     IconData(goal.iconCodePoint, fontFamily: 'MaterialIcons'),
                     size: 48,
-                    color: Color(goal.colorValue),
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -147,14 +174,13 @@ class _GoalCard extends StatelessWidget {
                           height: 48,
                           margin: const EdgeInsets.only(right: 14),
                           decoration: BoxDecoration(
-                            color:
-                                Color(goal.colorValue).withValues(alpha: 0.15),
+                            color: Colors.white.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: Icon(
                             IconData(goal.iconCodePoint,
                                 fontFamily: 'MaterialIcons'),
-                            color: Color(goal.colorValue),
+                            color: Colors.white,
                           ),
                         ),
                       Expanded(
@@ -165,6 +191,7 @@ class _GoalCard extends StatelessWidget {
                               goal.name,
                               style: context.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w600,
+                                color: Colors.white,
                               ),
                             ),
                             if (daysRemaining != null)
@@ -174,9 +201,8 @@ class _GoalCard extends StatelessWidget {
                                     : 'Target date passed',
                                 style: context.textTheme.bodySmall?.copyWith(
                                   color: daysRemaining > 0
-                                      ? context.colorScheme.onSurface
-                                          .withValues(alpha: 0.6)
-                                      : AppTheme.warning,
+                                      ? Colors.white.withValues(alpha: 0.7)
+                                      : const Color(0xFFFFB347),
                                 ),
                               ),
                           ],
@@ -187,7 +213,7 @@ class _GoalCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: AppTheme.success.withValues(alpha: 0.1),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
@@ -196,13 +222,13 @@ class _GoalCard extends StatelessWidget {
                               const Icon(
                                 Icons.check_circle,
                                 size: 14,
-                                color: AppTheme.success,
+                                color: Color(0xFF7FFF7F),
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 'Completed',
                                 style: context.textTheme.labelSmall?.copyWith(
-                                  color: AppTheme.success,
+                                  color: const Color(0xFF7FFF7F),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -218,15 +244,15 @@ class _GoalCard extends StatelessWidget {
                     radius: 50,
                     lineWidth: 10,
                     percent: progress,
-                    backgroundColor:
-                        context.colorScheme.outline.withValues(alpha: 0.1),
-                    progressColor: Color(goal.colorValue),
+                    backgroundColor: Colors.white.withValues(alpha: 0.15),
+                    progressColor: Colors.white,
                     circularStrokeCap: CircularStrokeCap.round,
                     animation: true,
                     center: Text(
                       '${(progress * 100).toInt()}%',
                       style: context.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
                   ),
@@ -242,15 +268,14 @@ class _GoalCard extends StatelessWidget {
                           Text(
                             'Saved',
                             style: context.textTheme.labelSmall?.copyWith(
-                              color: context.colorScheme.onSurface
-                                  .withValues(alpha: 0.5),
+                              color: Colors.white.withValues(alpha: 0.6),
                             ),
                           ),
                           Text(
                             AppFormatters.formatCurrency(saved),
                             style: context.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: AppTheme.success,
+                              color: const Color(0xFF7FFF7F),
                             ),
                           ),
                         ],
@@ -261,14 +286,14 @@ class _GoalCard extends StatelessWidget {
                           Text(
                             'Target',
                             style: context.textTheme.labelSmall?.copyWith(
-                              color: context.colorScheme.onSurface
-                                  .withValues(alpha: 0.5),
+                              color: Colors.white.withValues(alpha: 0.6),
                             ),
                           ),
                           Text(
                             AppFormatters.formatCurrency(target),
                             style: context.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
                           ),
                         ],
@@ -285,6 +310,11 @@ class _GoalCard extends StatelessWidget {
                         onPressed: () {
                           _showAddMoneyDialog(context, goal);
                         },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          side: BorderSide(
+                              color: Colors.white.withValues(alpha: 0.5)),
+                        ),
                         icon: const Icon(Icons.add),
                         label: const Text('Add Money'),
                       ),
