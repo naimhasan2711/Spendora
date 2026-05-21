@@ -43,36 +43,40 @@ class AppConstants {
   static const Duration splashDuration = Duration(seconds: 2);
 }
 
-/// Default category icons mapping
+/// Default category icons mapping - Enriched with relevant, high-quality icons
 class CategoryIcons {
   CategoryIcons._();
 
   static const Map<String, int> expense = {
-    'Food & Dining': 0xe56c, // restaurant
-    'Transport': 0xe1d5, // directions_car
-    'Shopping': 0xe59d, // shopping_bag
-    'Bills & Utilities': 0xe873, // receipt
-    'Entertainment': 0xe5dc, // movie
-    'Health': 0xe548, // favorite
+    'Food & Dining': 0xe56c, // restaurant_menu
+    'Transport': 0xe531, // directions_bus (or car)
+    'Shopping': 0xf37d, // shopping_bag_outlined
+    'Bills & Utilities': 0xe8e9, // receipt_long
+    'Entertainment': 0xea65, // theaters / movie
+    'Health': 0xf109, // medical_services
     'Education': 0xe80c, // school
-    'Travel': 0xe539, // flight
+    'Travel': 0xe539, // flight_takeoff
     'Groceries': 0xe8cc, // shopping_cart
-    'Rent': 0xe88a, // home
-    'Insurance': 0xe8e8, // security
+    'Rent': 0xe73a, // house
+    'Insurance': 0xf00d, // health_and_safety
     'Personal Care': 0xea21, // spa
-    'Gifts': 0xe8f6, // card_giftcard
-    'Subscriptions': 0xe863, // subscriptions
+    'Gifts': 0xea10, // redeem
+    'Subscriptions': 0xe1af, // subscriptions
+    'Office': 0xe8f9, // work / business_center
+    'Medicine': 0xf3eb, // medication
     'Other': 0xe5d3, // more_horiz
   };
 
   static const Map<String, int> income = {
-    'Salary': 0xe850, // account_balance_wallet
-    'Business': 0xe0af, // business
-    'Freelance': 0xe30a, // laptop
-    'Investment': 0xe263, // trending_up
-    'Gifts': 0xe8f6, // card_giftcard
-    'Rental': 0xe88a, // home
-    'Refund': 0xe042, // replay
+    'Salary': 0xe263, // payments
+    'Business': 0xe0af, // store / business
+    'Freelance': 0xe30a, // laptop_mac
+    'Investment': 0xe6e1, // show_chart
+    'Gifts': 0xea10, // redeem
+    'Rental': 0xe73a, // house
+    'Refund': 0xe5d5, // undo
+    'Bonus': 0xf06f, // workspace_premium
+    'Interest': 0xe84f, // account_balance
     'Other': 0xe5d3, // more_horiz
   };
 }

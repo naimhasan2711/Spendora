@@ -24,7 +24,7 @@ class _AddAccountScreenState extends ConsumerState<AddAccountScreen> {
 
   AccountType _type = AccountType.cash;
   int _selectedIconCodePoint = 0xe850; // account_balance_wallet
-  Color _selectedColor = const Color(0xFF6C63FF);
+  Color _selectedColor = const Color(0xFF0D4A3E);
   bool _isDefault = false;
   bool _excludeFromTotal = false;
 

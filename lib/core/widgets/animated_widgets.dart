@@ -199,9 +199,8 @@ class ProfileAvatar extends ConsumerWidget {
           CircleAvatar(
             radius: radius,
             backgroundColor: context.colorScheme.primary,
-            backgroundImage: hasImage
-                ? FileImage(File(settings.userImagePath!))
-                : null,
+            backgroundImage:
+                hasImage ? FileImage(File(settings.userImagePath!)) : null,
             child: hasImage
                 ? null
                 : Icon(
@@ -251,7 +250,7 @@ class AppHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Row(
       children: [
         const ProfileAvatar(radius: 16),

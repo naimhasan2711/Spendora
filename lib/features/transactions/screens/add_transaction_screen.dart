@@ -34,6 +34,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _notesController = TextEditingController();
+  final _amountFocusNode = FocusNode();
 
   TransactionType _type = TransactionType.expense;
   String? _selectedCategoryId;
@@ -68,7 +69,20 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
       // Set default account
       final settings = ref.read(settingsProvider);
       _selectedAccountId = settings.defaultAccountId;
+      // Auto-focus amount field for new transactions
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _amountFocusNode.requestFocus();
+      });
     }
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _amountController.dispose();
+    _notesController.dispose();
+    _amountFocusNode.dispose();
+    super.dispose();
   }
 
   void _loadTransaction() {
@@ -103,14 +117,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
       _selectedCategoryId = null;
       _selectedSubcategoryId = null;
     });
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    _amountController.dispose();
-    _notesController.dispose();
-    super.dispose();
   }
 
   @override
@@ -246,66 +252,108 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
   }
 
   Widget _buildAmountField() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentColor =
+        _type == TransactionType.expense ? AppTheme.expense : AppTheme.income;
+
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 32),
       decoration: BoxDecoration(
-        color: (_type == TransactionType.expense
-                ? AppTheme.expense
-                : AppTheme.income)
-            .withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          colors: isDark
+              ? [const Color(0xFF1E1E2E), const Color(0xFF252538)]
+              : [
+                  accentColor.withValues(alpha: 0.08),
+                  accentColor.withValues(alpha: 0.03)
+                ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: accentColor.withValues(alpha: 0.2),
+          width: 1,
+        ),
       ),
       child: Column(
         children: [
-          Text(
-            'Amount',
-            style: context.textTheme.bodyMedium?.copyWith(
-              color: context.colorScheme.onSurface.withValues(alpha: 0.6),
+          // Calculator-style display
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            decoration: BoxDecoration(
+              color:
+                  isDark ? Colors.black.withValues(alpha: 0.3) : Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  '৳',
+                  style: context.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: accentColor,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: TextFormField(
+                    controller: _amountController,
+                    focusNode: _amountFocusNode,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    textAlign: TextAlign.right,
+                    style: context.textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 40,
+                      color: context.colorScheme.onSurface,
+                      letterSpacing: -1,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: '0',
+                      hintStyle: context.textTheme.displaySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 40,
+                        color: context.colorScheme.onSurface
+                            .withValues(alpha: 0.2),
+                        letterSpacing: -1,
+                      ),
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Enter amount';
+                      }
+                      if (double.tryParse(value) == null) {
+                        return 'Invalid amount';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '৳',
-                style: context.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: _type == TransactionType.expense
-                      ? AppTheme.expense
-                      : AppTheme.income,
-                ),
-              ),
-              const SizedBox(width: 4),
-              IntrinsicWidth(
-                child: TextFormField(
-                  controller: _amountController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  textAlign: TextAlign.center,
-                  style: context.textTheme.displaySmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                  decoration: const InputDecoration(
-                    hintText: '0.00',
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Enter amount';
-                    }
-                    if (double.tryParse(value) == null) {
-                      return 'Invalid amount';
-                    }
-                    return null;
-                  },
-                ),
-              ),
-            ],
+          const SizedBox(height: 12),
+          Text(
+            _type == TransactionType.expense
+                ? 'Enter expense amount'
+                : 'Enter income amount',
+            style: context.textTheme.bodySmall?.copyWith(
+              color: context.colorScheme.onSurface.withValues(alpha: 0.5),
+            ),
           ),
         ],
       ),
@@ -981,7 +1029,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen>
                     context: context,
                     icon: Icons.camera_alt_rounded,
                     label: 'Camera',
-                    color: const Color(0xFF6C63FF),
+                    color: const Color(0xFF0D4A3E),
                     onTap: () async {
                       Navigator.pop(context);
                       final image = await picker.pickImage(

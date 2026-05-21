@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 class AppTheme {
   AppTheme._();
 
-  // Primary Colors - Dark Green (from design)
+  // Primary Colors - Dark Teal Green (consistent across themes)
   static const Color _primaryLight = Color(0xFF0D4A3E);
-  static const Color _primaryDark = Color(0xFF7C4DFF); // Purple for dark theme
+  static const Color _primaryDark =
+      Color(0xFF14A085); // Teal for dark theme (avoiding purple)
 
   // Secondary Colors
   static const Color _secondaryLight = Color(0xFF10B981);
-  static const Color _secondaryDark = Color(0xFFA78BFA);
+  static const Color _secondaryDark = Color(0xFF34D399);
 
   // Background Colors
   static const Color _backgroundLight = Color(0xFFF5F5F5);
@@ -41,16 +42,16 @@ class AppTheme {
   static const Color income = Color(0xFF22C55E);
   static const Color expense = Color(0xFFEF4444);
 
-  // Gradient Colors - Primary Green Gradient (for balance card)
+  // Gradient Colors - Primary Teal Gradient
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [Color(0xFF0D4A3E), Color(0xFF166555)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  // Purple Gradient for dark theme FAB
-  static const LinearGradient purpleGradient = LinearGradient(
-    colors: [Color(0xFF7C4DFF), Color(0xFFA78BFA)],
+  // Teal Gradient for dark theme FAB (replacing purple)
+  static const LinearGradient tealGradient = LinearGradient(
+    colors: [Color(0xFF0D6B5E), Color(0xFF14A085)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

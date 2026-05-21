@@ -45,10 +45,25 @@ class AccountsNotifier extends StateNotifier<List<AccountModel>> {
 
   final _hiveService = HiveService.instance;
 
-  /// Load accounts from Hive
+  // Deprecated account names to remove
+  static const _deprecatedAccounts = ['nagad', 'rocket'];
+
+  /// Load accounts from Hive and remove deprecated ones
   void _loadAccounts() {
-    state = _hiveService.accountsBox.values.toList()
-      ..sort((a, b) => a.order.compareTo(b.order));
+    final allAccounts = _hiveService.accountsBox.values.toList();
+
+    // Remove deprecated accounts (Nagad, Rocket)
+    final validAccounts = <AccountModel>[];
+    for (final account in allAccounts) {
+      if (_deprecatedAccounts.contains(account.name.toLowerCase())) {
+        // Delete from Hive
+        _hiveService.accountsBox.delete(account.id);
+      } else {
+        validAccounts.add(account);
+      }
+    }
+
+    state = validAccounts..sort((a, b) => a.order.compareTo(b.order));
   }
 
   /// Add a new account

@@ -26,7 +26,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       title: 'Track Every Expense',
       description:
           'Easily record your daily expenses and income. Keep track of where your money goes with just a few taps.',
-      color: Color(0xFF6C63FF),
+      color: Color(0xFF0D4A3E),
     ),
     const OnboardingData(
       icon: Icons.pie_chart_rounded,

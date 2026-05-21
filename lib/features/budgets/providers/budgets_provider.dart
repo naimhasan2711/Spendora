@@ -57,6 +57,10 @@ final categoryBudgetProvider =
 class BudgetsNotifier extends StateNotifier<List<BudgetModel>> {
   BudgetsNotifier(this._ref) : super([]) {
     _loadBudgets();
+    // Listen for transaction changes to recalculate budgets
+    _ref.listen<List<TransactionModel>>(transactionsProvider, (_, __) {
+      _updateBudgetSpending();
+    });
   }
 
   final Ref _ref;

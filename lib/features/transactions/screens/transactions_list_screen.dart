@@ -68,75 +68,40 @@ class TransactionsListScreen extends ConsumerWidget {
               delay: const Duration(milliseconds: 100),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => context.push(AppRoutes.search),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 14),
-                          decoration: BoxDecoration(
-                            color:
-                                isDark ? const Color(0xFF252538) : Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: context.colorScheme.onSurface
-                                  .withValues(alpha: 0.1),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.search_rounded,
-                                color: context.colorScheme.onSurface
-                                    .withValues(alpha: 0.4),
-                                size: 22,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  'Search transactions...',
-                                  style: context.textTheme.bodyMedium?.copyWith(
-                                    color: context.colorScheme.onSurface
-                                        .withValues(alpha: 0.4),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                child: GestureDetector(
+                  onTap: () => context.push(AppRoutes.search),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF252538) : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: context.colorScheme.onSurface
+                            .withValues(alpha: 0.1),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    // Filter Button
-                    GestureDetector(
-                      onTap: () => _showFilterSheet(context, ref),
-                      child: Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: filter.hasFilters
-                              ? context.colorScheme.primary
-                              : (isDark ? const Color(0xFF252538) : Colors.white),
-                          borderRadius: BorderRadius.circular(12),
-                          border: filter.hasFilters
-                              ? null
-                              : Border.all(
-                                  color: context.colorScheme.onSurface
-                                      .withValues(alpha: 0.1),
-                                ),
-                        ),
-                        child: Icon(
-                          Icons.tune_rounded,
-                          color: filter.hasFilters
-                              ? Colors.white
-                              : context.colorScheme.primary,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.search_rounded,
+                          color: context.colorScheme.onSurface
+                              .withValues(alpha: 0.4),
                           size: 22,
                         ),
-                      ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Search transactions...',
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              color: context.colorScheme.onSurface
+                                  .withValues(alpha: 0.4),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -226,15 +191,6 @@ class TransactionsListScreen extends ConsumerWidget {
     );
   }
 
-  void _showFilterSheet(BuildContext context, WidgetRef ref) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _FilterSheet(),
-    );
-  }
-
   Widget _buildEmptyState(BuildContext context, bool hasFilters) {
     return Center(
       child: Padding(
@@ -303,7 +259,7 @@ class _FilterTab extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected
-              ? (isDark ? const Color(0xFF7C4DFF) : const Color(0xFF0D4A3E))
+              ? (isDark ? const Color(0xFF0D6B5E) : const Color(0xFF0D4A3E))
               : (isDark ? const Color(0xFF252538) : Colors.white),
           borderRadius: BorderRadius.circular(20),
           border: isSelected

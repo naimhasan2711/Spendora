@@ -161,7 +161,7 @@ class MainScreen extends ConsumerWidget {
         shape: BoxShape.circle,
         gradient: isDark
             ? const LinearGradient(
-                colors: [Color(0xFF7C4DFF), Color(0xFFA78BFA)],
+                colors: [Color(0xFF0D6B5E), Color(0xFF14A085)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               )
@@ -172,7 +172,7 @@ class MainScreen extends ConsumerWidget {
               ),
         boxShadow: [
           BoxShadow(
-            color: (isDark ? const Color(0xFF7C4DFF) : const Color(0xFF0D4A3E))
+            color: (isDark ? const Color(0xFF0D6B5E) : const Color(0xFF0D4A3E))
                 .withValues(alpha: 0.4),
             blurRadius: 16,
             offset: const Offset(0, 6),

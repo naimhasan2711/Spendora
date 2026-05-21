@@ -23,7 +23,7 @@ class _AddCategoryScreenState extends ConsumerState<AddCategoryScreen> {
 
   TransactionType _type = TransactionType.expense;
   int _selectedIconCodePoint = 0xe5d3; // more_horiz
-  Color _selectedColor = const Color(0xFF6C63FF);
+  Color _selectedColor = const Color(0xFF0D4A3E);
 
   bool _isEditing = false;
   bool _isLoading = false;
@@ -189,26 +189,75 @@ class _AddCategoryScreenState extends ConsumerState<AddCategoryScreen> {
   }
 
   Widget _buildIconGrid() {
+    // Expanded Material Icons library
     final icons = [
-      0xe56c, // restaurant
+      // Food & Dining
+      0xe56c, // restaurant_menu
+      0xefef, // local_cafe (coffee)
+      0xe56e, // fastfood
+      0xea6c, // lunch_dining
+      0xea60, // bakery_dining
+      0xe8cc, // shopping_cart (groceries)
+
+      // Transport
+      0xe531, // directions_bus
       0xe1d5, // directions_car
-      0xe59d, // shopping_bag
-      0xe873, // receipt
-      0xe5dc, // movie
-      0xe548, // favorite
-      0xe80c, // school
+      0xe558, // local_taxi
+      0xe54f, // local_parking
+      0xe546, // local_gas_station
       0xe539, // flight
-      0xe8cc, // shopping_cart
-      0xe88a, // home
-      0xe8e8, // security
+
+      // Shopping
+      0xf37d, // shopping_bag
+      0xe59d, // local_mall
+      0xea77, // checkroom (clothing)
+      0xe1b1, // devices (electronics)
+
+      // Home & Bills
+      0xe73a, // house
+      0xe8e9, // receipt_long
+      0xea0b, // electrical_services
+      0xe798, // water_drop
+      0xe63e, // wifi
+      0xe32c, // phone
+
+      // Health & Personal
+      0xf109, // medical_services
+      0xf3eb, // medication (pill)
+      0xeb43, // fitness_center
       0xea21, // spa
-      0xe8f6, // card_giftcard
-      0xe863, // subscriptions
-      0xe850, // account_balance_wallet
-      0xe0af, // business
-      0xe30a, // laptop
-      0xe263, // trending_up
-      0xe042, // replay
+      0xe548, // favorite (health)
+
+      // Work & Education
+      0xe8f9, // work (briefcase)
+      0xe80c, // school
+      0xe865, // menu_book
+      0xe30a, // laptop_mac
+
+      // Entertainment
+      0xea65, // theaters
+      0xea28, // sports_esports
+      0xeb4f, // sports
+      0xe3a2, // music_note
+
+      // Finance
+      0xe263, // payments
+      0xe84f, // account_balance
+      0xe8d3, // savings
+      0xe6e1, // show_chart
+      0xe870, // credit_card
+
+      // Travel
+      0xe53a, // hotel
+      0xeb3e, // beach_access
+      0xe55f, // luggage
+
+      // Other
+      0xea10, // redeem (gift)
+      0xe1af, // subscriptions
+      0xf00d, // health_and_safety
+      0xe5d5, // undo (refund)
+      0xe0af, // store
       0xe5d3, // more_horiz
     ];
 

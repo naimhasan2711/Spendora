@@ -260,14 +260,14 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
                         ref.read(reportPeriodProvider.notifier).state = 0,
                   ),
                   const SizedBox(width: 8),
-                _PeriodTab(
-                  label: 'Yearly',
-                  isSelected: period == 1,
-                  onTap: () =>
-                      ref.read(reportPeriodProvider.notifier).state = 1,
-                ),
-              ],
-            ),
+                  _PeriodTab(
+                    label: 'Yearly',
+                    isSelected: period == 1,
+                    onTap: () =>
+                        ref.read(reportPeriodProvider.notifier).state = 1,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 24),
 
@@ -275,6 +275,13 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
             AnimatedFadeSlide(
               delay: const Duration(milliseconds: 200),
               child: const _IncomeExpensesCard(),
+            ),
+            const SizedBox(height: 16),
+
+            // Weekly Expenses Card with animation
+            AnimatedFadeSlide(
+              delay: const Duration(milliseconds: 225),
+              child: const _WeeklyExpensesCard(),
             ),
             const SizedBox(height: 16),
 
@@ -655,6 +662,257 @@ class _LegendItem extends StatelessWidget {
 }
 
 /// Average Daily Spending Card
+/// Weekly Expenses Card with Bar Chart
+class _WeeklyExpensesCard extends ConsumerWidget {
+  const _WeeklyExpensesCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedMonth = ref.watch(selectedMonthProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final weeklyData = _getWeeklyData(ref, selectedMonth);
+
+    // Calculate total weekly expense
+    double totalWeeklyExpense = 0;
+    for (final data in weeklyData) {
+      totalWeeklyExpense += data['expense'] as double;
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isDark
+              ? [const Color(0xFF1A3A34), const Color(0xFF0D524A)]
+              : [const Color(0xFF0D6B5E), const Color(0xFF14A085)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0D6B5E).withValues(alpha: 0.3),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Glossy overlay
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 50,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(20)),
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withValues(alpha: 0.12),
+                    Colors.white.withValues(alpha: 0.03),
+                    Colors.transparent,
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Weekly Expenses',
+                        style: context.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Last 7 days breakdown',
+                        style: context.textTheme.bodySmall?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      AppFormatters.formatCurrency(totalWeeklyExpense),
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // Bar Chart
+              SizedBox(
+                height: 140,
+                child: BarChart(
+                  _buildWeeklyBarChartData(context, weeklyData),
+                  swapAnimationDuration: const Duration(milliseconds: 250),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Map<String, dynamic>> _getWeeklyData(
+      WidgetRef ref, DateTime currentMonth) {
+    final result = <Map<String, dynamic>>[];
+    final now = DateTime.now();
+
+    // Get last 7 days data
+    for (int i = 6; i >= 0; i--) {
+      final date = now.subtract(Duration(days: i));
+      final transactions = ref.watch(transactionsProvider);
+
+      double dayExpense = 0;
+      for (final t in transactions) {
+        if (t.type == TransactionType.expense &&
+            t.dateTime.year == date.year &&
+            t.dateTime.month == date.month &&
+            t.dateTime.day == date.day) {
+          dayExpense += t.amount;
+        }
+      }
+
+      result.add({
+        'day': _getDayAbbr(date.weekday),
+        'expense': dayExpense,
+        'isToday': i == 0,
+      });
+    }
+
+    return result;
+  }
+
+  String _getDayAbbr(int weekday) {
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    return days[weekday - 1];
+  }
+
+  BarChartData _buildWeeklyBarChartData(
+    BuildContext context,
+    List<Map<String, dynamic>> data,
+  ) {
+    final maxY = data.fold<double>(0, (max, item) {
+          final expense = item['expense'] as double;
+          return expense > max ? expense : max;
+        }) *
+        1.3;
+
+    return BarChartData(
+      alignment: BarChartAlignment.spaceAround,
+      maxY: maxY > 0 ? maxY : 1000,
+      barTouchData: BarTouchData(
+        enabled: true,
+        touchTooltipData: BarTouchTooltipData(
+          getTooltipColor: (group) => Colors.white,
+          tooltipPadding: const EdgeInsets.all(8),
+          tooltipMargin: 8,
+          getTooltipItem: (group, groupIndex, rod, rodIndex) {
+            final item = data[groupIndex];
+            return BarTooltipItem(
+              AppFormatters.formatCurrency(item['expense'] as double),
+              const TextStyle(
+                color: Color(0xFF0D4A3E),
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+              ),
+            );
+          },
+        ),
+      ),
+      titlesData: FlTitlesData(
+        show: true,
+        rightTitles:
+            const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        bottomTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            reservedSize: 28,
+            getTitlesWidget: (value, meta) {
+              final index = value.toInt();
+              if (index >= 0 && index < data.length) {
+                final isToday = data[index]['isToday'] as bool;
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    data[index]['day'] as String,
+                    style: TextStyle(
+                      color: isToday
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.6),
+                      fontWeight: isToday ? FontWeight.bold : FontWeight.w500,
+                      fontSize: 11,
+                    ),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      ),
+      gridData: const FlGridData(show: false),
+      borderData: FlBorderData(show: false),
+      barGroups: data.asMap().entries.map((entry) {
+        final index = entry.key;
+        final item = entry.value;
+        final isToday = item['isToday'] as bool;
+
+        return BarChartGroupData(
+          x: index,
+          barRods: [
+            BarChartRodData(
+              toY: (item['expense'] as double) > 0
+                  ? item['expense'] as double
+                  : 0,
+              color:
+                  isToday ? Colors.white : Colors.white.withValues(alpha: 0.5),
+              width: 28,
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(8)),
+              backDrawRodData: BackgroundBarChartRodData(
+                show: true,
+                toY: maxY > 0 ? maxY : 1000,
+                color: Colors.white.withValues(alpha: 0.1),
+              ),
+            ),
+          ],
+        );
+      }).toList(),
+    );
+  }
+}
+
 class _AvgDailySpendingCard extends ConsumerWidget {
   const _AvgDailySpendingCard();
 

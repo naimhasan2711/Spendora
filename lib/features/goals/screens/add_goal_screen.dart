@@ -26,7 +26,7 @@ class _AddGoalScreenState extends ConsumerState<AddGoalScreen> {
   final _notesController = TextEditingController();
 
   int _selectedIconCodePoint = 0xe8e5; // savings
-  Color _selectedColor = const Color(0xFF6C63FF);
+  Color _selectedColor = const Color(0xFF0D4A3E);
   DateTime? _targetDate;
 
   bool _isEditing = false;

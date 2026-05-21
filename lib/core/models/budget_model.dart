@@ -38,7 +38,7 @@ class BudgetModel {
     this.isActive = true,
     this.notificationEnabled = true,
     this.notifyAtPercent = 80.0,
-    this.colorValue = 0xFF6C63FF,
+    this.colorValue = 0xFF0D4A3E,
     DateTime? createdAt,
     DateTime? updatedAt,
   })  : id = id ?? const Uuid().v4(),
@@ -132,7 +132,7 @@ class BudgetModel {
       isActive: json['isActive'] as bool? ?? true,
       notificationEnabled: json['notificationEnabled'] as bool? ?? true,
       notifyAtPercent: (json['notifyAtPercent'] as num?)?.toDouble() ?? 80.0,
-      colorValue: json['colorValue'] as int? ?? 0xFF6C63FF,
+      colorValue: json['colorValue'] as int? ?? 0xFF0D4A3E,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );

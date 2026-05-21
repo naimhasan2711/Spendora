@@ -128,67 +128,120 @@ class DashboardScreen extends ConsumerWidget {
 
   Widget _buildBalanceCard(
       BuildContext context, double totalBalance, MonthlySummary summary) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF0D4A3E), Color(0xFF166555)],
+        gradient: LinearGradient(
+          colors: isDark
+              ? [
+                  const Color(0xFF1A3A34),
+                  const Color(0xFF0D524A),
+                  const Color(0xFF0A3D36)
+                ]
+              : [
+                  const Color(0xFF0D6B5E),
+                  const Color(0xFF14A085),
+                  const Color(0xFF0D6B5E)
+                ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
+          stops: const [0.0, 0.5, 1.0],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0D4A3E).withValues(alpha: 0.3),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
+            color: const Color(0xFF0D6B5E).withValues(alpha: 0.4),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+          BoxShadow(
+            color: Colors.white.withValues(alpha: 0.1),
+            blurRadius: 1,
+            offset: const Offset(0, -1),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Text(
-            'TOTAL BALANCE',
-            style: context.textTheme.labelSmall?.copyWith(
-              color: Colors.white.withValues(alpha: 0.7),
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.w500,
+          // Glossy overlay
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 60,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.white.withValues(alpha: 0.15),
+                    Colors.white.withValues(alpha: 0.05),
+                    Colors.transparent,
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 8),
-          TweenAnimationBuilder<double>(
-            tween: Tween(begin: 0, end: totalBalance),
-            duration: const Duration(milliseconds: 800),
-            curve: Curves.easeOutCubic,
-            builder: (context, value, child) {
-              return Text(
-                AppFormatters.formatCurrency(value),
-                style: context.textTheme.headlineLarge?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 32,
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: 20),
-          Row(
+          // Content
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _BalanceBadge(
-                icon: Icons.arrow_downward_rounded,
-                label: 'Income',
-                amount: summary.income,
-                backgroundColor: AppTheme.income.withValues(alpha: 0.2),
-                textColor: Colors.white,
+              Text(
+                'TOTAL BALANCE',
+                style: context.textTheme.labelSmall?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.8),
+                  letterSpacing: 1.0,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
-              const SizedBox(width: 16),
-              _BalanceBadge(
-                icon: Icons.arrow_upward_rounded,
-                label: 'Expenses',
-                amount: summary.expense,
-                backgroundColor: AppTheme.expense.withValues(alpha: 0.2),
-                textColor: Colors.white,
+              const SizedBox(height: 8),
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0, end: totalBalance),
+                duration: const Duration(milliseconds: 800),
+                curve: Curves.easeOutCubic,
+                builder: (context, value, child) {
+                  return FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      AppFormatters.formatCurrency(value),
+                      style: context.textTheme.headlineLarge?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 32,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: _BalanceBadge(
+                      icon: Icons.arrow_downward_rounded,
+                      label: 'Income',
+                      amount: summary.income,
+                      backgroundColor: Colors.white.withValues(alpha: 0.15),
+                      textColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _BalanceBadge(
+                      icon: Icons.arrow_upward_rounded,
+                      label: 'Expenses',
+                      amount: summary.expense,
+                      backgroundColor: Colors.white.withValues(alpha: 0.15),
+                      textColor: Colors.white,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -217,42 +270,54 @@ class _BalanceBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.1),
+          width: 1,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(4),
+            padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: textColor, size: 14),
+            child: Icon(icon, color: textColor, size: 16),
           ),
           const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                label,
-                style: context.textTheme.labelSmall?.copyWith(
-                  color: textColor.withValues(alpha: 0.7),
-                  fontSize: 10,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: context.textTheme.labelSmall?.copyWith(
+                    color: textColor.withValues(alpha: 0.8),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-              Text(
-                AppFormatters.formatCurrency(amount),
-                style: context.textTheme.titleSmall?.copyWith(
-                  color: textColor,
-                  fontWeight: FontWeight.bold,
+                const SizedBox(height: 2),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    AppFormatters.formatCurrency(amount),
+                    style: context.textTheme.titleSmall?.copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),

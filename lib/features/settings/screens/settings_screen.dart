@@ -1,10 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 
 import '../../../core/models/settings_model.dart';
 import '../../../core/router/app_router.dart';
@@ -13,7 +9,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/animated_widgets.dart';
 import '../providers/settings_provider.dart';
 
-/// Settings Screen - Optimized version without biometric and language
+/// Settings Screen - Streamlined version
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -51,16 +47,9 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8),
         children: [
-          // Profile Card - Now with full editing capability
-          AnimatedFadeSlide(
-            delay: const Duration(milliseconds: 100),
-            child: _ProfileCard(settings: settings),
-          ),
-          const SizedBox(height: 16),
-
           // Security Section - App Lock only (removed Biometric)
           AnimatedFadeSlide(
-            delay: const Duration(milliseconds: 150),
+            delay: const Duration(milliseconds: 100),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -77,7 +66,9 @@ class SettingsScreen extends ConsumerWidget {
                         if (value) {
                           context.push('${AppRoutes.pin}?setup=true');
                         } else {
-                          ref.read(settingsProvider.notifier).setPinEnabled(false);
+                          ref
+                              .read(settingsProvider.notifier)
+                              .setPinEnabled(false);
                         }
                       },
                     ),
@@ -89,7 +80,7 @@ class SettingsScreen extends ConsumerWidget {
 
           // Preferences Section - Currency and Theme (removed Language)
           AnimatedFadeSlide(
-            delay: const Duration(milliseconds: 200),
+            delay: const Duration(milliseconds: 150),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -119,7 +110,7 @@ class SettingsScreen extends ConsumerWidget {
 
           // Data Management Section
           AnimatedFadeSlide(
-            delay: const Duration(milliseconds: 250),
+            delay: const Duration(milliseconds: 200),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -150,7 +141,7 @@ class SettingsScreen extends ConsumerWidget {
 
           // Support & About Section
           AnimatedFadeSlide(
-            delay: const Duration(milliseconds: 300),
+            delay: const Duration(milliseconds: 250),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -175,13 +166,15 @@ class SettingsScreen extends ConsumerWidget {
                       title: 'Help Center',
                       onTap: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Help Center coming soon!')),
+                          const SnackBar(
+                              content: Text('Help Center coming soon!')),
                         );
                       },
                     ),
                     _SettingsActionTile(
                       icon: Icons.description_outlined,
-                      iconColor: context.colorScheme.onSurface.withValues(alpha: 0.6),
+                      iconColor:
+                          context.colorScheme.onSurface.withValues(alpha: 0.6),
                       title: 'Terms of Service',
                       onTap: () {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -198,7 +191,7 @@ class SettingsScreen extends ConsumerWidget {
 
           // Version Info
           AnimatedFadeSlide(
-            delay: const Duration(milliseconds: 350),
+            delay: const Duration(milliseconds: 300),
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: Center(
@@ -499,267 +492,6 @@ class SettingsScreen extends ConsumerWidget {
 // ============================================================================
 // Helper Widgets
 // ============================================================================
-
-/// Profile Card Widget with editing capability
-class _ProfileCard extends ConsumerStatefulWidget {
-  final SettingsModel settings;
-
-  const _ProfileCard({required this.settings});
-
-  @override
-  ConsumerState<_ProfileCard> createState() => _ProfileCardState();
-}
-
-class _ProfileCardState extends ConsumerState<_ProfileCard> {
-  final ImagePicker _picker = ImagePicker();
-  bool _isEditing = false;
-  late TextEditingController _nameController;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(text: widget.settings.userName);
-  }
-
-  @override
-  void didUpdateWidget(_ProfileCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.settings.userName != widget.settings.userName) {
-      _nameController.text = widget.settings.userName;
-    }
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _pickImage() async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 500,
-        maxHeight: 500,
-        imageQuality: 80,
-      );
-
-      if (image != null) {
-        // Copy image to app's documents directory for persistence
-        final directory = await getApplicationDocumentsDirectory();
-        final String newPath = '${directory.path}/profile_image.jpg';
-        await File(image.path).copy(newPath);
-
-        ref.read(settingsProvider.notifier).setUserImagePath(newPath);
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error picking image: $e'),
-            backgroundColor: AppTheme.error,
-          ),
-        );
-      }
-    }
-  }
-
-  void _saveName() {
-    final name = _nameController.text.trim();
-    if (name.isNotEmpty) {
-      ref.read(settingsProvider.notifier).setUserName(name);
-      setState(() => _isEditing = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Profile updated successfully!'),
-          backgroundColor: AppTheme.success,
-        ),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final settings = ref.watch(settingsProvider);
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF252538) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: isDark
-            ? null
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-      ),
-      child: Column(
-        children: [
-          // Avatar with edit overlay
-          GestureDetector(
-            onTap: _pickImage,
-            child: Stack(
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor:
-                      context.colorScheme.primary.withValues(alpha: 0.1),
-                  backgroundImage: settings.userImagePath != null
-                      ? FileImage(File(settings.userImagePath!))
-                      : null,
-                  child: settings.userImagePath == null
-                      ? Icon(
-                          Icons.person_rounded,
-                          size: 40,
-                          color: context.colorScheme.primary,
-                        )
-                      : null,
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: context.colorScheme.primary,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                    ),
-                    child: const Icon(
-                      Icons.camera_alt,
-                      color: Colors.white,
-                      size: 14,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Name - editable
-          if (_isEditing)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 150,
-                  child: TextField(
-                    controller: _nameController,
-                    textAlign: TextAlign.center,
-                    autofocus: true,
-                    style: context.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    decoration: const InputDecoration(
-                      isDense: true,
-                      border: UnderlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(vertical: 4),
-                    ),
-                    onSubmitted: (_) => _saveName(),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.check, color: AppTheme.success),
-                  onPressed: _saveName,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close, color: AppTheme.error),
-                  onPressed: () {
-                    _nameController.text = settings.userName;
-                    setState(() => _isEditing = false);
-                  },
-                ),
-              ],
-            )
-          else
-            GestureDetector(
-              onTap: () => setState(() => _isEditing = true),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    settings.userName,
-                    style: context.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(
-                    Icons.edit,
-                    size: 16,
-                    color: context.colorScheme.onSurface.withValues(alpha: 0.5),
-                  ),
-                ],
-              ),
-            ),
-          const SizedBox(height: 4),
-
-          // Email placeholder
-          Text(
-            'Tap to edit your profile',
-            style: context.textTheme.bodyMedium?.copyWith(
-              color: context.colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          // Badge
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _Badge(
-                label: 'FREE USER',
-                color: context.colorScheme.primary.withValues(alpha: 0.1),
-                textColor: context.colorScheme.primary,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Badge Widget
-class _Badge extends StatelessWidget {
-  final String label;
-  final Color color;
-  final Color textColor;
-
-  const _Badge({
-    required this.label,
-    required this.color,
-    required this.textColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: textColor,
-          letterSpacing: 0.5,
-        ),
-      ),
-    );
-  }
-}
 
 /// Section Header Widget
 class _SectionHeader extends StatelessWidget {

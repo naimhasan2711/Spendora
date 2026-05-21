@@ -144,7 +144,7 @@ class AccountModel {
   }
 }
 
-/// Default Accounts for Bangladesh
+/// Default Accounts - Cleaned up with professional icons
 class DefaultAccounts {
   DefaultAccounts._();
 
@@ -153,7 +153,7 @@ class DefaultAccounts {
           id: 'cash',
           name: 'Cash',
           type: AccountType.cash,
-          iconCodePoint: 0xe850, // account_balance_wallet
+          iconCodePoint: 0xe263, // payments
           colorValue: 0xFF4CAF50,
           isDefault: true,
         ),
@@ -161,22 +161,8 @@ class DefaultAccounts {
           id: 'bkash',
           name: 'bKash',
           type: AccountType.wallet,
-          iconCodePoint: 0xe0d0, // phone_android
+          iconCodePoint: 0xe325, // phone_iphone
           colorValue: 0xFFE2136E,
-        ),
-        AccountModel(
-          id: 'nagad',
-          name: 'Nagad',
-          type: AccountType.wallet,
-          iconCodePoint: 0xe0d0,
-          colorValue: 0xFFFF6B00,
-        ),
-        AccountModel(
-          id: 'rocket',
-          name: 'Rocket',
-          type: AccountType.wallet,
-          iconCodePoint: 0xe0d0,
-          colorValue: 0xFF8B2E8B,
         ),
         AccountModel(
           id: 'bank',
@@ -191,6 +177,13 @@ class DefaultAccounts {
           type: AccountType.creditCard,
           iconCodePoint: 0xe870, // credit_card
           colorValue: 0xFF9C27B0,
+        ),
+        AccountModel(
+          id: 'savings',
+          name: 'Savings',
+          type: AccountType.savings,
+          iconCodePoint: 0xe8d3, // savings
+          colorValue: 0xFF00BCD4,
         ),
       ];
 }

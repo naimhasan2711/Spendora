@@ -331,7 +331,7 @@ class BudgetModelAdapter extends TypeAdapter<BudgetModel> {
       isActive: fields[8] as bool? ?? true,
       notificationEnabled: fields[9] as bool? ?? true,
       notifyAtPercent: fields[10] as double? ?? 80.0,
-      colorValue: fields[11] as int? ?? 0xFF6C63FF,
+      colorValue: fields[11] as int? ?? 0xFF0D4A3E,
       createdAt: fields[12] as DateTime?,
       updatedAt: fields[13] as DateTime?,
     );
